@@ -10,7 +10,7 @@ st.set_page_config(layout="wide")
 # -------------------------
 @st.cache_data
 def load_data():
-    df = pd.read_csv("Campaign_Performance_GA4_2026_CSV.csv")
+    df = pd.read_csv("data/Campaign_Performance_GA4_2026_CSV.csv")
     df.columns = df.columns.str.strip()
     return df
  
