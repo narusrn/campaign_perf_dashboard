@@ -27,7 +27,8 @@ df["Conversion(Users)"] = (
     .str.replace("-", "0", regex=False)
     .astype(float)
 )
-df = df.rename(columns={"Conversion(Users)": "Conversion", "Brand category": "Brand Category"})
+
+df = df.rename(columns={"Conversion(Users)": "Conversion", "Brand category": "Brand Category", "Conversion_rate": "Conversion Rate"})
 # -------------------------
 # FILTER BAR
 # -------------------------
