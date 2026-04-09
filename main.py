@@ -124,30 +124,45 @@ st.plotly_chart(fig3, use_container_width=True)
 st.subheader("📈 Traffic vs Conversion per Campaign")
  
 df_sorted = filtered_df.sort_values(by='Visit', ascending=False)
- 
+
 fig4 = go.Figure()
- 
+
+# bar → y axis หลัก
 fig4.add_trace(go.Bar(
     x=df_sorted['Campaign Name'],
     y=df_sorted['Conversion'],
-    name='Conversion'
+    name='Conversion',
+    yaxis='y1'
 ))
- 
+
+# line → y axis ขวา
 fig4.add_trace(go.Scatter(
     x=df_sorted['Campaign Name'],
     y=df_sorted['Visit'],
     mode='lines+markers',
-    name='Visit'
+    name='Visit',
+    yaxis='y2'
 ))
- 
+
 fig4.update_layout(
-    xaxis_title="Campaign",
-    yaxis_title="Value",
+    xaxis=dict(title="Campaign"),
+
+    # แกนซ้าย
+    yaxis=dict(
+        title="Conversion"
+    ),
+
+    # แกนขวา
+    yaxis2=dict(
+        title="Visit",
+        overlaying='y',   # ซ้อนแกน y หลัก
+        side='right'
+    ),
+
     barmode='group'
 )
- 
+
 st.plotly_chart(fig4, use_container_width=True)
- 
 # -------------------------
 # 5. Ranking Table
 # -------------------------
