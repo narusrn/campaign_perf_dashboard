@@ -177,7 +177,7 @@ st.plotly_chart(fig6, use_container_width=True)
 # -------------------------
 st.subheader("📈 Big Prize vs Conversion")
  
-prize_group = filtered_df.groupby('Prize')['Conversion'].sum().reset_index()
+prize_group = filtered_df.groupby('Big Prize')['Conversion'].sum().reset_index()
  
 fig7 = px.line(
     prize_group,
