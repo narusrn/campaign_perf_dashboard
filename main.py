@@ -177,33 +177,41 @@ st.dataframe(ranking, use_container_width=True)
 # -------------------------
 # 6. Line - Key Features
 # -------------------------
-st.subheader("📈 Campaign Key Features vs Visit")
- 
-feature_group = filtered_df.groupby('Campaign Key Features')['Visit'].sum().reset_index()
- 
-fig6 = px.line(
+st.subheader("📊 Campaign Key Features vs Visit")
+
+feature_group = (
+    filtered_df
+    .groupby('Campaign Key Features')['Visit']
+    .sum()
+    .reset_index()
+)
+
+fig6 = px.bar(
     feature_group,
     x='Campaign Key Features',
-    y='Visit',
-    markers=True
+    y='Visit'
 )
- 
+
 st.plotly_chart(fig6, use_container_width=True)
  
 # -------------------------
 # 7. Line - Prize
 # -------------------------
-st.subheader("📈 Big Prize vs Conversion")
- 
-prize_group = filtered_df.groupby('Big Prize')['Conversion'].sum().reset_index(drop=False)
- 
-fig7 = px.line(
+st.subheader("📊 Big Prize vs Conversion")
+
+prize_group = (
+    filtered_df
+    .groupby('Big Prize')['Conversion']
+    .sum()
+    .reset_index()
+)
+
+fig7 = px.bar(
     prize_group,
     x='Big Prize',
-    y='Conversion',
-    markers=True
+    y='Conversion'
 )
- 
+
 st.plotly_chart(fig7, use_container_width=True)
  
 # -------------------------
