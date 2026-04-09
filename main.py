@@ -2,7 +2,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
- 
+from datetime import datetime
+
+now_str = datetime.now().strftime("%d-%b-%y")
+
 st.set_page_config(layout="wide")
  
 # -------------------------
@@ -198,7 +201,8 @@ st.dataframe(filtered_df, use_container_width=True)
 # 9. Timeline
 # -------------------------
 st.subheader("🗓️ Campaign Timeline")
- 
+
+filtered_df['End Date'] = filtered_df['End Date'].replace("-", now_str)
 filtered_df['Start Date'] = pd.to_datetime(filtered_df['Start Date'])
 filtered_df['End Date'] = pd.to_datetime(filtered_df['End Date'])
  
