@@ -28,6 +28,7 @@ def load_data():
     return df
  
 df = load_data()
+
 df["Visit"] = (
     df["Visit"]
     .str.replace(",", "", regex=False)
