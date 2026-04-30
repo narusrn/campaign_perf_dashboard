@@ -17,7 +17,6 @@ st.set_page_config(layout="wide")
 #     df.columns = df.columns.str.strip()
 #     return df
 
- @st.cache_data(ttl=1800)  # 30 นาที = 1800 วินาที
 def load_data():
     sheet_id = "1OisRn14n89ZKwTd2LDyZbwR9iZOMkT9JUzEORVhHkrE"
     gid = "0"
