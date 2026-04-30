@@ -11,9 +11,20 @@ st.set_page_config(layout="wide")
 # -------------------------
 # LOAD DATA
 # -------------------------
-@st.cache_data
+# @st.cache_data
+# def load_data():
+#     df = pd.read_csv("data/Campaign_Performance_GA4_2026_CSV.csv")
+#     df.columns = df.columns.str.strip()
+#     return df
+
+ @st.cache_data(ttl=1800)  # 30 นาที = 1800 วินาที
 def load_data():
-    df = pd.read_csv("data/Campaign_Performance_GA4_2026_CSV.csv")
+    sheet_id = "1OisRn14n89ZKwTd2LDyZbwR9iZOMkT9JUzEORVhHkrE"
+    gid = "0"
+
+    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
+
+    df = pd.read_csv(url)
     df.columns = df.columns.str.strip()
     return df
  
