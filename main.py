@@ -48,7 +48,7 @@ df = df.rename(columns={"Conversion(Users)": "Conversion", "Brand category": "Br
 # -------------------------
 st.title("Campaign Performance Dashboard")
  
-st.subheader("🔎 Filters")
+st.subheader("• Filters")
  
 col1, col2, col3 = st.columns(3)
  
@@ -83,7 +83,7 @@ filtered_df = df[
 # -------------------------
 # KPI
 # -------------------------
-st.subheader("📌 Overview KPI")
+st.subheader("• Overview KPI")
  
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Campaign", len(filtered_df))
@@ -93,7 +93,7 @@ col3.metric("Total Conversion", int(filtered_df['Conversion'].sum()))
 # -------------------------
 # 1. Donut - Brand Category
 # -------------------------
-st.subheader("🍩 Brand Category Distribution")
+st.subheader("• Brand Category Distribution")
  
 brand_cat = filtered_df['Brand Category'].value_counts().reset_index()
 brand_cat.columns = ['Brand Category', 'Count']
@@ -104,7 +104,7 @@ st.plotly_chart(fig1, use_container_width=True)
 # -------------------------
 # 2. Donut - Brand
 # -------------------------
-st.subheader("🍩 Brand Distribution")
+st.subheader("• Brand Distribution")
  
 brand = filtered_df['Brand'].value_counts().reset_index()
 brand.columns = ['Brand', 'Count']
@@ -115,7 +115,7 @@ st.plotly_chart(fig2, use_container_width=True)
 # -------------------------
 # 3. Horizontal Bar
 # -------------------------
-st.subheader("📊 Campaign Type Distribution")
+st.subheader("• Campaign Type Distribution")
  
 campaign_type = filtered_df['Campaign Type'].value_counts().reset_index()
 campaign_type.columns = ['Campaign Type', 'Count']
@@ -132,7 +132,7 @@ st.plotly_chart(fig3, use_container_width=True)
 # -------------------------
 # 4. Combo Chart
 # -------------------------
-st.subheader("📈 Traffic vs Conversion per Campaign")
+st.subheader("• Traffic vs Conversion per Campaign")
  
 df_sorted = filtered_df.sort_values(by='Visit', ascending=False)
 
@@ -177,7 +177,7 @@ st.plotly_chart(fig4, use_container_width=True)
 # -------------------------
 # 5. Ranking Table
 # -------------------------
-st.subheader("🏆 Campaign Ranking")
+st.subheader("• Campaign Ranking")
  
 ranking = filtered_df.sort_values(by='Conversion Rate', ascending=False)[
     ['Campaign Name', 'Conversion Rate', 'Key Event']
@@ -188,7 +188,7 @@ st.dataframe(ranking, use_container_width=True)
 # -------------------------
 # 6. Line - Key Features
 # -------------------------
-st.subheader("📊 Campaign Key Features vs Visit")
+st.subheader("• Campaign Key Features vs Visit")
 
 feature_group = (
     filtered_df
@@ -208,7 +208,7 @@ st.plotly_chart(fig6, use_container_width=True)
 # -------------------------
 # 7. Line - Prize
 # -------------------------
-st.subheader("📊 Big Prize vs Conversion")
+st.subheader("• Big Prize vs Conversion")
 
 prize_group = (
     filtered_df
@@ -228,13 +228,13 @@ st.plotly_chart(fig7, use_container_width=True)
 # -------------------------
 # 8. Overview Table
 # -------------------------
-st.subheader("📋 Overview Table")
+st.subheader("• Overview Table")
 st.dataframe(filtered_df, use_container_width=True)
  
 # -------------------------
 # 9. Timeline
 # -------------------------
-st.subheader("🗓️ Campaign Timeline")
+st.subheader("• Campaign Timeline")
 
 filtered_df['End Date'] = filtered_df['End Date'].replace("-", now_str)
 filtered_df['Start Date'] = pd.to_datetime(filtered_df['Start Date'],errors='coerce')
