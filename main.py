@@ -46,7 +46,7 @@ df = df.rename(columns={"Conversion(Users)": "Conversion", "Brand category": "Br
 # -------------------------
 # FILTER BAR
 # -------------------------
-st.title("📊 Campaign Performance Dashboard")
+st.title("Campaign Performance Dashboard")
  
 st.subheader("🔎 Filters")
  
