@@ -237,7 +237,7 @@ st.dataframe(filtered_df, use_container_width=True)
 st.subheader("🗓️ Campaign Timeline")
 
 filtered_df['End Date'] = filtered_df['End Date'].replace("-", now_str)
-filtered_df['Start Date'] = pd.to_datetime(filtered_df['Start Date'])
+filtered_df['Start Date'] = pd.to_datetime(filtered_df['Start Date'],errors='coerce')
 filtered_df['End Date'] = pd.to_datetime(filtered_df['End Date'])
  
 fig9 = px.timeline(
