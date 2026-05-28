@@ -372,7 +372,7 @@ with col1:
                 },
                 "label": {"show": True, "position": "right", "fontSize": 13},
             }],
-        }, height="370px")
+        }, height="460px")
 
 with col2:
     with st.container(border=True):
@@ -396,7 +396,7 @@ with col2:
                 "data": [{"value": int(r["Count"]), "name": r["Brand"]} for _, r in brand.iterrows()],
                 "color": COLORS,
             }],
-        }, height="370px")
+        }, height="460px")
 
 with col3:
     with st.container(border=True):
