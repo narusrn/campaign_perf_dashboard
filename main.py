@@ -68,15 +68,6 @@ with st.sidebar:
 
     st.divider()
     st.subheader("• Filters")
-
-# -------------------------
-# HEADER
-# -------------------------
-col_logo, col_title = st.columns([1, 8])
-with col_logo:
-    st.image(logo_path, width=80)
-with col_title:
-    st.title("Campaign Performance Dashboard")
     brand_cat_filter = st.multiselect(
         "Brand Category",
         options=df["Brand Category"].dropna().unique(),
@@ -104,6 +95,15 @@ with col_title:
         min_value=min_date,
         max_value=max_date
     )
+
+# -------------------------
+# HEADER
+# -------------------------
+col_logo, col_title = st.columns([1, 8])
+with col_logo:
+    st.image(logo_path, width=80)
+with col_title:
+    st.title("Campaign Performance Dashboard")
 
 if len(date_range) == 2:
     start_filter, end_filter = date_range
