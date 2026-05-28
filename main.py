@@ -21,11 +21,11 @@ st.markdown("""
     .block-container { padding-top: 1rem; padding-bottom: 1rem; }
 
     [data-testid="stMetricValue"] {
-        font-size: 2rem !important;
+        font-size: 2.3rem !important;
         font-weight: 700 !important;
     }
     [data-testid="stMetricLabel"] {
-        font-size: 0.75rem !important;
+        font-size: 0.85rem !important;
         font-weight: 600 !important;
         text-transform: uppercase;
         letter-spacing: 0.07em;
@@ -33,7 +33,7 @@ st.markdown("""
     }
 
     h3 {
-        font-size: 0.85rem !important;
+        font-size: 0.95rem !important;
         font-weight: 700 !important;
         text-transform: uppercase;
         letter-spacing: 0.09em;
@@ -131,9 +131,9 @@ with st.sidebar:
 with open(logo_path, "rb") as f:
     logo_b64 = base64.b64encode(f.read()).decode()
 st.markdown(
-    f'<div style="display:flex;align-items:center;gap:10px;padding:18px 0 8px 0;">'
-    f'<img src="data:image/png;base64,{logo_b64}" style="height:44px;width:auto;">'
-    f'<span style="font-size:2rem;font-weight:700;line-height:1.2;">Campaign Performance Dashboard</span>'
+    f'<div style="display:flex;align-items:center;gap:12px;padding:28px 0 10px 0;">'
+    f'<img src="data:image/png;base64,{logo_b64}" style="height:52px;width:auto;">'
+    f'<span style="font-size:2.4rem;font-weight:700;line-height:1.2;">Campaign Performance Dashboard</span>'
     f'</div>',
     unsafe_allow_html=True,
 )
