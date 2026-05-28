@@ -506,7 +506,7 @@ with st.container(border=True):
             var idx   = api.value(0);
             var start = api.coord([api.value(1), idx]);
             var end   = api.coord([api.value(2), idx]);
-            var h     = api.size([0, 1])[1] * 0.55;
+            var h     = api.size([0, 1])[1] * 0.8;
             return {
                 type: 'rect',
                 shape: { x: start[0], y: start[1] - h / 2,
