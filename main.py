@@ -46,6 +46,13 @@ df = df.rename(columns={
     "Key event": "Key Event"
 })
 
+df["Conversion Rate"] = (
+    pd.to_numeric(
+        df["Conversion Rate"].astype(str).str.replace("%", "", regex=False).str.strip(),
+        errors="coerce"
+    )
+)
+
 # -------------------------
 # HEADER
 # -------------------------
@@ -55,27 +62,22 @@ with col_logo:
 with col_title:
     st.title("Campaign Performance Dashboard")
 
-st.divider()
 
 # -------------------------
-# FILTER BAR
+# SIDEBAR FILTERS
 # -------------------------
-st.subheader("• Filters")
-
-col1, col2, col3 = st.columns(3)
-with col1:
+with st.sidebar:
+    st.subheader("• Filters")
     brand_cat_filter = st.multiselect(
         "Brand Category",
         options=df["Brand Category"].dropna().unique(),
         default=df["Brand Category"].dropna().unique()
     )
-with col2:
     brand_filter = st.multiselect(
         "Brand",
         options=df["Brand"].dropna().unique(),
         default=df["Brand"].dropna().unique()
     )
-with col3:
     campaign_type_filter = st.multiselect(
         "Campaign Type",
         options=df["Campaign Type"].dropna().unique(),
@@ -88,7 +90,6 @@ filtered_df = df[
     (df["Campaign Type"].isin(campaign_type_filter))
 ]
 
-st.divider()
 
 # -------------------------
 # ROW 1: KPI CARDS
@@ -98,8 +99,7 @@ st.subheader("• Overview KPI")
 total_campaigns  = len(filtered_df)
 total_visits     = int(filtered_df["Visit"].sum())
 total_conversions = int(filtered_df["Conversion"].sum())
-conv_rate_series = pd.to_numeric(filtered_df["Conversion Rate"], errors="coerce")
-avg_conv_rate    = conv_rate_series.mean()
+avg_conv_rate = filtered_df["Conversion Rate"].mean()
 
 k1, k2, k3, k4 = st.columns(4)
 with k1:
@@ -113,7 +113,7 @@ with k3:
         st.metric("Total Conversions", f"{total_conversions:,}")
 with k4:
     with st.container(border=True):
-        st.metric("Avg Conversion Rate", f"{avg_conv_rate:.2f}" if pd.notna(avg_conv_rate) else "N/A")
+        st.metric("Avg Conversion Rate", f"{avg_conv_rate:.2f}%" if pd.notna(avg_conv_rate) else "N/A")
 
 st.divider()
 
