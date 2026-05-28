@@ -74,6 +74,45 @@ section[data-testid="stSidebar"] .stDateInput label {
     overflow: hidden;
 }
 
+@media print {
+    section[data-testid="stSidebar"],
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    header { display: none !important; }
+
+    .stApp, .block-container {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100% !important;
+        gap: 12px !important;
+        break-inside: avoid !important;
+    }
+
+    [data-testid="column"] {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        break-inside: avoid !important;
+    }
+
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        box-shadow: none !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    iframe {
+        width: 100% !important;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
