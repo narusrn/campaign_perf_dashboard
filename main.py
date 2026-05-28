@@ -12,7 +12,7 @@ st.set_page_config(layout="wide", page_title="Campaign Performance")
 def img_to_html(path, height=50):
     with open(path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-    return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px;width:auto;display:block;">'
+    return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px;width:auto;display:block;margin-top:12px;">'
 
 COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#fc8452", "#9a60b4", "#ea7ccc"]
 
