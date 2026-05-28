@@ -111,6 +111,21 @@ section[data-testid="stSidebar"] .stDateInput label {
     iframe {
         width: 100% !important;
     }
+
+    h3 {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+    }
+
+    hr {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+    }
+
+    [data-testid="stVerticalBlock"] {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
 }
 
 </style>
