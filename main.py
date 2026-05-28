@@ -14,43 +14,57 @@ def img_to_html(path, height=50):
         encoded = base64.b64encode(f.read()).decode()
     return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px;width:auto;display:block;">'
 
+def kpi_card(label, value, c1, c2):
+    return f'''<div style="
+        background:linear-gradient(135deg,{c1},{c2});
+        border-radius:16px;padding:22px 20px;color:white;
+        box-shadow:0 4px 18px rgba(0,0,0,0.13);
+        display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:0.75rem;font-weight:700;opacity:0.88;
+                    text-transform:uppercase;letter-spacing:0.1em;">{label}</div>
+        <div style="font-size:2.2rem;font-weight:800;line-height:1.0;">{value}</div>
+    </div>'''
+
 COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#fc8452", "#9a60b4", "#ea7ccc"]
 
 st.markdown("""
 <style>
-    .block-container { padding-top: 1rem; padding-bottom: 1rem; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    [data-testid="stMetricValue"] {
-        font-size: 2.6rem !important;
-        font-weight: 700 !important;
-    }
-    [data-testid="stMetricLabel"] {
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        opacity: 0.65;
-    }
+html, body, [class*="css"], .stApp, button, input, select, textarea {
+    font-family: 'Inter', sans-serif !important;
+}
 
-    h3 {
-        font-size: 1.05rem !important;
-        font-weight: 700 !important;
-        text-transform: uppercase;
-        letter-spacing: 0.09em;
-        color: #5470c6 !important;
-        margin-bottom: 0.5rem !important;
-    }
+.stApp { background: #f0f4f8 !important; }
+.block-container { padding-top: 0.5rem !important; padding-bottom: 1rem; }
 
-    hr { border-color: #eef1f7 !important; margin: 0.75rem 0 !important; }
+h3 {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #1e293b !important;
+    margin-bottom: 0.75rem !important;
+    padding-left: 12px !important;
+    border-left: 4px solid #5470c6 !important;
+}
 
-    section[data-testid="stSidebar"] { background: #f4f7ff !important; }
-    section[data-testid="stSidebar"] h3 { color: #5470c6 !important; }
-    section[data-testid="stSidebar"] .stMultiSelect label,
-    section[data-testid="stSidebar"] .stDateInput label {
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        opacity: 0.8;
-    }
+hr { border-color: #e2e8f0 !important; margin: 1rem 0 !important; }
+
+section[data-testid="stSidebar"] {
+    background: #ffffff !important;
+    border-right: 1px solid #e2e8f0 !important;
+}
+section[data-testid="stSidebar"] h3 {
+    color: #1e293b !important;
+    border-left-color: #5470c6 !important;
+}
+section[data-testid="stSidebar"] .stMultiSelect label,
+section[data-testid="stSidebar"] .stDateInput label {
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -94,6 +108,8 @@ df["Start Date Parsed"] = pd.to_datetime(
 logo_path = "assets/black-logo.png"
 
 with st.sidebar:
+    st.markdown(img_to_html("assets/black-logo.png", height=36), unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:12px'></div>", unsafe_allow_html=True)
     st.subheader("• Filters")
     brand_cat_filter = st.multiselect(
         "Brand Category",
@@ -126,9 +142,14 @@ with st.sidebar:
 with open(logo_path, "rb") as f:
     logo_b64 = base64.b64encode(f.read()).decode()
 st.markdown(
-    f'<div style="display:flex;align-items:center;gap:12px;padding:28px 0 10px 0;">'
+    f'<div style="display:flex;align-items:center;gap:14px;padding:28px 0 12px 0;">'
     f'<img src="data:image/png;base64,{logo_b64}" style="height:52px;width:auto;">'
-    f'<span style="font-size:2.4rem;font-weight:700;line-height:1.2;">Campaign Performance Dashboard</span>'
+    f'<div>'
+    f'<div style="font-size:2rem;font-weight:800;color:#1e293b;line-height:1.1;'
+    f'font-family:Inter,sans-serif;letter-spacing:-0.02em;">Campaign Performance Dashboard</div>'
+    f'<div style="font-size:0.82rem;color:#64748b;margin-top:3px;font-family:Inter,sans-serif;">'
+    f'As of {now_str}</div>'
+    f'</div>'
     f'</div>',
     unsafe_allow_html=True,
 )
@@ -164,17 +185,14 @@ avg_conv_rate     = filtered_df["Conversion Rate"].mean()
 
 k1, k2, k3, k4 = st.columns(4)
 with k1:
-    with st.container(border=True):
-        st.metric("Total Campaigns", f"{total_campaigns:,}")
+    st.markdown(kpi_card("Total Campaigns", f"{total_campaigns:,}", "#5470c6", "#73c0de"), unsafe_allow_html=True)
 with k2:
-    with st.container(border=True):
-        st.metric("Total Visits", f"{total_visits:,}")
+    st.markdown(kpi_card("Total Visits", f"{total_visits:,}", "#57a661", "#91cc75"), unsafe_allow_html=True)
 with k3:
-    with st.container(border=True):
-        st.metric("Total Conversions", f"{total_conversions:,}")
+    st.markdown(kpi_card("Total Conversions", f"{total_conversions:,}", "#e07b39", "#fac858"), unsafe_allow_html=True)
 with k4:
-    with st.container(border=True):
-        st.metric("Avg Conversion Rate", f"{avg_conv_rate:.2f}%" if pd.notna(avg_conv_rate) else "N/A")
+    conv_val = f"{avg_conv_rate:.2f}%" if pd.notna(avg_conv_rate) else "N/A"
+    st.markdown(kpi_card("Avg Conversion Rate", conv_val, "#9a60b4", "#ea7ccc"), unsafe_allow_html=True)
 
 st.divider()
 
