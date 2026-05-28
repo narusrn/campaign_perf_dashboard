@@ -45,6 +45,18 @@ st.markdown("""
         font-weight: 600 !important;
         opacity: 0.8;
     }
+
+    /* Logo: same height as h1, vertically centered */
+    [data-testid="stImage"] img {
+        max-height: 52px !important;
+        width: auto !important;
+        object-fit: contain;
+    }
+    [data-testid="column"]:first-child {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -121,7 +133,7 @@ with st.sidebar:
 # -------------------------
 # HEADER
 # -------------------------
-col_logo, col_title = st.columns([1, 6])
+col_logo, col_title = st.columns([1, 10])
 with col_logo:
     st.image(logo_path, use_container_width=True)
 with col_title:
@@ -220,7 +232,7 @@ with col_l:
                 },
             },
         ],
-    }, height="420px")
+    }, height="480px")
 
 with col_r:
     brand_cat = filtered_df["Brand Category"].value_counts().reset_index()
@@ -243,7 +255,7 @@ with col_r:
             "data": [{"value": int(r["Count"]), "name": r["Brand Category"]} for _, r in brand_cat.iterrows()],
             "color": COLORS,
         }],
-    }, height="420px")
+    }, height="480px")
 
 st.divider()
 
@@ -356,12 +368,33 @@ with col_l:
 with col_r:
     st.subheader("• Campaign Ranking")
     ranking = (
-        filtered_df.sort_values("Conversion Rate", ascending=False)[
-            ["Campaign Name", "Conversion Rate", "Key Event"]
-        ].reset_index(drop=True)
+        filtered_df.sort_values("Conversion Rate", ascending=False)
+        .head(10)[["Campaign Name", "Conversion Rate"]]
+        .reset_index(drop=True)
     )
-    ranking.index += 1
-    st.dataframe(ranking, use_container_width=True, height=350)
+    st_echarts(options={
+        "tooltip": {
+            "trigger": "axis",
+            "axisPointer": {"type": "shadow"},
+            "formatter": JsCode("function(p){return p[0].name + '<br/>Conversion Rate: <b>' + p[0].value + '%</b>'}").js_code,
+        },
+        "grid": {"left": "3%", "right": "18%", "top": "3%", "bottom": "3%", "containLabel": True},
+        "xAxis": {"type": "value", "axisLabel": {"formatter": "{value}%"}},
+        "yAxis": {
+            "type": "category",
+            "data": ranking["Campaign Name"].tolist()[::-1],
+            "axisLabel": {"fontSize": 10, "width": 120, "overflow": "truncate"},
+        },
+        "series": [{
+            "type": "bar",
+            "data": ranking["Conversion Rate"].round(2).tolist()[::-1],
+            "itemStyle": {
+                "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#91cc75'}])").js_code,
+                "borderRadius": [0, 6, 6, 0],
+            },
+            "label": {"show": True, "position": "right", "fontSize": 10, "formatter": "{c}%"},
+        }],
+    }, height="390px")
 
 st.divider()
 
