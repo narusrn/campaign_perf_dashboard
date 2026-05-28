@@ -91,11 +91,9 @@ df["Start Date Parsed"] = pd.to_datetime(
 # -------------------------
 # SIDEBAR
 # -------------------------
-with st.sidebar:
-    dark_mode = st.toggle("🌙 Dark Theme", value=False)
-    logo_path = "assets/white-logo.png" if dark_mode else "assets/black-logo.png"
+logo_path = "assets/black-logo.png"
 
-    st.divider()
+with st.sidebar:
     st.subheader("• Filters")
     brand_cat_filter = st.multiselect(
         "Brand Category",
@@ -112,14 +110,11 @@ with st.sidebar:
         options=df["Campaign Type"].dropna().unique(),
         default=df["Campaign Type"].dropna().unique(),
     )
-
-    st.divider()
-    st.subheader("• Date Range")
     valid_dates = df["Start Date Parsed"].dropna()
     min_date = valid_dates.min().date()
     max_date = valid_dates.max().date()
     date_range = st.date_input(
-        "Start Date",
+        "Date Range",
         value=(min_date, max_date),
         min_value=min_date,
         max_value=max_date,
