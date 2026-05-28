@@ -7,26 +7,23 @@ from datetime import datetime
 now_str = datetime.now().strftime("%d-%b-%y")
 
 st.set_page_config(layout="wide")
- 
-# -------------------------
-# LOAD DATA
-# -------------------------
-# @st.cache_data
-# def load_data():
-#     df = pd.read_csv("data/Campaign_Performance_GA4_2026_CSV.csv")
-#     df.columns = df.columns.str.strip()
-#     return df
+
+BLUE   = "#5470c6"
+GREEN  = "#91cc75"
+YELLOW = "#fac858"
+RED    = "#ee6666"
+TEAL   = "#73c0de"
+ORANGE = "#fc8452"
+COLORS = [BLUE, GREEN, YELLOW, RED, TEAL, ORANGE]
 
 def load_data():
     sheet_id = "1OisRn14n89ZKwTd2LDyZbwR9iZOMkT9JUzEORVhHkrE"
     gid = "0"
-
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
-
     df = pd.read_csv(url)
     df.columns = df.columns.str.strip()
     return df
- 
+
 df = load_data()
 
 df["Visit"] = (
@@ -42,216 +39,221 @@ df["Conversion(Users)"] = (
     .astype(float)
 )
 
-df = df.rename(columns={"Conversion(Users)": "Conversion", "Brand category": "Brand Category", "Conversion_rate": "Conversion Rate", "Key event": "Key Event"})
+df = df.rename(columns={
+    "Conversion(Users)": "Conversion",
+    "Brand category": "Brand Category",
+    "Conversion_rate": "Conversion Rate",
+    "Key event": "Key Event"
+})
+
 # -------------------------
-# FILTER BAR
+# HEADER
 # -------------------------
 col_logo, col_title = st.columns([1, 8])
 with col_logo:
     st.image("logo.png", width=80)
 with col_title:
     st.title("Campaign Performance Dashboard")
- 
+
+st.divider()
+
+# -------------------------
+# FILTER BAR
+# -------------------------
 st.subheader("• Filters")
- 
+
 col1, col2, col3 = st.columns(3)
- 
 with col1:
     brand_cat_filter = st.multiselect(
         "Brand Category",
-        options=df['Brand Category'].dropna().unique(),
-        default=df['Brand Category'].dropna().unique()
+        options=df["Brand Category"].dropna().unique(),
+        default=df["Brand Category"].dropna().unique()
     )
- 
 with col2:
     brand_filter = st.multiselect(
         "Brand",
-        options=df['Brand'].dropna().unique(),
-        default=df['Brand'].dropna().unique()
+        options=df["Brand"].dropna().unique(),
+        default=df["Brand"].dropna().unique()
     )
- 
 with col3:
     campaign_type_filter = st.multiselect(
         "Campaign Type",
-        options=df['Campaign Type'].dropna().unique(),
-        default=df['Campaign Type'].dropna().unique()
+        options=df["Campaign Type"].dropna().unique(),
+        default=df["Campaign Type"].dropna().unique()
     )
- 
-# APPLY FILTER
+
 filtered_df = df[
-    (df['Brand Category'].isin(brand_cat_filter)) &
-    (df['Brand'].isin(brand_filter)) &
-    (df['Campaign Type'].isin(campaign_type_filter))
+    (df["Brand Category"].isin(brand_cat_filter)) &
+    (df["Brand"].isin(brand_filter)) &
+    (df["Campaign Type"].isin(campaign_type_filter))
 ]
- 
+
+st.divider()
+
 # -------------------------
-# KPI
+# ROW 1: KPI CARDS
 # -------------------------
 st.subheader("• Overview KPI")
- 
+
+total_campaigns  = len(filtered_df)
+total_visits     = int(filtered_df["Visit"].sum())
+total_conversions = int(filtered_df["Conversion"].sum())
+conv_rate_series = pd.to_numeric(filtered_df["Conversion Rate"], errors="coerce")
+avg_conv_rate    = conv_rate_series.mean()
+
+k1, k2, k3, k4 = st.columns(4)
+with k1:
+    with st.container(border=True):
+        st.metric("Total Campaigns", f"{total_campaigns:,}")
+with k2:
+    with st.container(border=True):
+        st.metric("Total Visits", f"{total_visits:,}")
+with k3:
+    with st.container(border=True):
+        st.metric("Total Conversions", f"{total_conversions:,}")
+with k4:
+    with st.container(border=True):
+        st.metric("Avg Conversion Rate", f"{avg_conv_rate:.2f}" if pd.notna(avg_conv_rate) else "N/A")
+
+st.divider()
+
+# -------------------------
+# ROW 2: Traffic vs Conversion (3) | Brand Category Donut (2)
+# -------------------------
+st.subheader("• Traffic & Brand Overview")
+
+col_l, col_r = st.columns([3, 2])
+
+with col_l:
+    df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=df_sorted["Campaign Name"], y=df_sorted["Conversion"],
+        name="Conversion", marker_color=GREEN, yaxis="y1"
+    ))
+    fig.add_trace(go.Scatter(
+        x=df_sorted["Campaign Name"], y=df_sorted["Visit"],
+        mode="lines+markers", name="Visit",
+        line=dict(color=BLUE, width=2), yaxis="y2"
+    ))
+    fig.update_layout(
+        title="Traffic vs Conversion per Campaign",
+        xaxis=dict(tickangle=-45),
+        yaxis=dict(title="Conversion"),
+        yaxis2=dict(title="Visit", overlaying="y", side="right"),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+        height=400, margin=dict(t=60)
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+with col_r:
+    brand_cat = filtered_df["Brand Category"].value_counts().reset_index()
+    brand_cat.columns = ["Brand Category", "Count"]
+    fig = px.pie(brand_cat, names="Brand Category", values="Count", hole=0.5,
+                 title="Brand Category Distribution",
+                 color_discrete_sequence=COLORS)
+    fig.update_layout(height=400, margin=dict(t=60))
+    st.plotly_chart(fig, use_container_width=True)
+
+st.divider()
+
+# -------------------------
+# ROW 3: Campaign Type (1) | Brand Donut (1) | Big Prize (1)
+# -------------------------
+st.subheader("• Campaign Breakdown")
+
 col1, col2, col3 = st.columns(3)
-col1.metric("Total Campaign", len(filtered_df))
-col2.metric("Total Visit", int(filtered_df['Visit'].sum()))
-col3.metric("Total Conversion", int(filtered_df['Conversion'].sum()))
- 
-# -------------------------
-# 1. Donut - Brand Category
-# -------------------------
-st.subheader("• Brand Category Distribution")
- 
-brand_cat = filtered_df['Brand Category'].value_counts().reset_index()
-brand_cat.columns = ['Brand Category', 'Count']
- 
-fig1 = px.pie(brand_cat, names='Brand Category', values='Count', hole=0.5)
-st.plotly_chart(fig1, use_container_width=True)
- 
-# -------------------------
-# 2. Donut - Brand
-# -------------------------
-st.subheader("• Brand Distribution")
- 
-brand = filtered_df['Brand'].value_counts().reset_index()
-brand.columns = ['Brand', 'Count']
- 
-fig2 = px.pie(brand, names='Brand', values='Count', hole=0.5)
-st.plotly_chart(fig2, use_container_width=True)
- 
-# -------------------------
-# 3. Horizontal Bar
-# -------------------------
-st.subheader("• Campaign Type Distribution")
- 
-campaign_type = filtered_df['Campaign Type'].value_counts().reset_index()
-campaign_type.columns = ['Campaign Type', 'Count']
- 
-fig3 = px.bar(
-    campaign_type,
-    x='Count',
-    y='Campaign Type',
-    orientation='h'
-)
- 
-st.plotly_chart(fig3, use_container_width=True)
- 
-# -------------------------
-# 4. Combo Chart
-# -------------------------
-st.subheader("• Traffic vs Conversion per Campaign")
- 
-df_sorted = filtered_df.sort_values(by='Visit', ascending=False)
 
-fig4 = go.Figure()
+with col1:
+    campaign_type = filtered_df["Campaign Type"].value_counts().reset_index()
+    campaign_type.columns = ["Campaign Type", "Count"]
+    fig = px.bar(campaign_type, x="Count", y="Campaign Type", orientation="h",
+                 title="Campaign Type Distribution",
+                 color="Count",
+                 color_continuous_scale=[[0, TEAL], [1, BLUE]])
+    fig.update_layout(height=350, coloraxis_showscale=False, margin=dict(t=50))
+    st.plotly_chart(fig, use_container_width=True)
 
-# bar → y axis หลัก
-fig4.add_trace(go.Bar(
-    x=df_sorted['Campaign Name'],
-    y=df_sorted['Conversion'],
-    name='Conversion',
-    yaxis='y1'
-))
+with col2:
+    brand = filtered_df["Brand"].value_counts().reset_index()
+    brand.columns = ["Brand", "Count"]
+    fig = px.pie(brand, names="Brand", values="Count", hole=0.5,
+                 title="Brand Distribution",
+                 color_discrete_sequence=COLORS)
+    fig.update_layout(height=350, margin=dict(t=50))
+    st.plotly_chart(fig, use_container_width=True)
 
-# line → y axis ขวา
-fig4.add_trace(go.Scatter(
-    x=df_sorted['Campaign Name'],
-    y=df_sorted['Visit'],
-    mode='lines+markers',
-    name='Visit',
-    yaxis='y2'
-))
+with col3:
+    prize_group = filtered_df.groupby("Big Prize")["Conversion"].sum().reset_index()
+    fig = px.bar(prize_group, x="Big Prize", y="Conversion",
+                 title="Big Prize vs Conversion",
+                 color="Conversion",
+                 color_continuous_scale=[[0, YELLOW], [1, ORANGE]])
+    fig.update_layout(height=350, coloraxis_showscale=False, margin=dict(t=50))
+    st.plotly_chart(fig, use_container_width=True)
 
-fig4.update_layout(
-    xaxis=dict(title="Campaign"),
+st.divider()
 
-    # แกนซ้าย
-    yaxis=dict(
-        title="Conversion"
-    ),
-
-    # แกนขวา
-    yaxis2=dict(
-        title="Visit",
-        overlaying='y',   # ซ้อนแกน y หลัก
-        side='right'
-    ),
-
-    barmode='group'
-)
-
-st.plotly_chart(fig4, use_container_width=True)
 # -------------------------
-# 5. Ranking Table
+# ROW 4: Key Features (3) | Campaign Ranking Table (2)
 # -------------------------
-st.subheader("• Campaign Ranking")
- 
-ranking = filtered_df.sort_values(by='Conversion Rate', ascending=False)[
-    ['Campaign Name', 'Conversion Rate', 'Key Event']
-]
- 
-st.dataframe(ranking, use_container_width=True)
- 
-# -------------------------
-# 6. Line - Key Features
-# -------------------------
-st.subheader("• Campaign Key Features vs Visit")
+st.subheader("• Campaign Performance Details")
 
-feature_group = (
-    filtered_df
-    .groupby('Campaign Key Features')['Visit']
-    .sum()
-    .reset_index()
-)
+col_l, col_r = st.columns([3, 2])
 
-fig6 = px.bar(
-    feature_group,
-    x='Campaign Key Features',
-    y='Visit'
-)
+with col_l:
+    feature_group = (
+        filtered_df
+        .groupby("Campaign Key Features")["Visit"]
+        .sum()
+        .reset_index()
+        .sort_values("Visit", ascending=False)
+    )
+    fig = px.bar(feature_group, x="Campaign Key Features", y="Visit",
+                 title="Campaign Key Features vs Visit",
+                 color="Visit",
+                 color_continuous_scale=[[0, TEAL], [1, BLUE]])
+    fig.update_layout(height=350, coloraxis_showscale=False, margin=dict(t=50))
+    st.plotly_chart(fig, use_container_width=True)
 
-st.plotly_chart(fig6, use_container_width=True)
- 
-# -------------------------
-# 7. Line - Prize
-# -------------------------
-st.subheader("• Big Prize vs Conversion")
+with col_r:
+    st.markdown("**• Campaign Ranking**")
+    ranking = (
+        filtered_df
+        .sort_values("Conversion Rate", ascending=False)[
+            ["Campaign Name", "Conversion Rate", "Key Event"]
+        ]
+        .reset_index(drop=True)
+    )
+    ranking.index += 1
+    st.dataframe(ranking, use_container_width=True, height=320)
 
-prize_group = (
-    filtered_df
-    .groupby('Big Prize')['Conversion']
-    .sum()
-    .reset_index()
-)
+st.divider()
 
-fig7 = px.bar(
-    prize_group,
-    x='Big Prize',
-    y='Conversion'
-)
-
-st.plotly_chart(fig7, use_container_width=True)
- 
 # -------------------------
-# 8. Overview Table
-# -------------------------
-st.subheader("• Overview Table")
-st.dataframe(filtered_df, use_container_width=True)
- 
-# -------------------------
-# 9. Timeline
+# ROW 5: Timeline (Full Width)
 # -------------------------
 st.subheader("• Campaign Timeline")
 
-filtered_df['End Date'] = filtered_df['End Date'].replace("-", now_str)
-filtered_df['Start Date'] = pd.to_datetime(filtered_df['Start Date'],errors='coerce')
-filtered_df['End Date'] = pd.to_datetime(filtered_df['End Date'])
- 
-fig9 = px.timeline(
+filtered_df = filtered_df.copy()
+filtered_df["End Date"] = filtered_df["End Date"].replace("-", now_str)
+filtered_df["Start Date"] = pd.to_datetime(filtered_df["Start Date"], errors="coerce")
+filtered_df["End Date"] = pd.to_datetime(filtered_df["End Date"])
+
+fig = px.timeline(
     filtered_df,
-    x_start="Start Date",
-    x_end="End Date",
-    y="Campaign Name",
-    color="Brand"
+    x_start="Start Date", x_end="End Date",
+    y="Campaign Name", color="Brand",
+    color_discrete_sequence=COLORS
 )
- 
-fig9.update_yaxes(autorange="reversed")
- 
-st.plotly_chart(fig9, use_container_width=True)
+fig.update_yaxes(autorange="reversed")
+fig.update_layout(height=500, margin=dict(t=40))
+st.plotly_chart(fig, use_container_width=True)
+
+st.divider()
+
+# -------------------------
+# ROW 6: Overview Table (Full Width)
+# -------------------------
+st.subheader("• Overview Table")
+st.dataframe(filtered_df, use_container_width=True)
