@@ -66,6 +66,14 @@ section[data-testid="stSidebar"] .stDateInput label {
     color: #475569 !important;
 }
 
+[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 16px !important;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.07) !important;
+    border: 1px solid #e2e8f0 !important;
+    background: white !important;
+    overflow: hidden;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -204,70 +212,72 @@ st.subheader("• Traffic & Brand Overview")
 col_l, col_r = st.columns([3, 2])
 
 with col_l:
-    df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
-    st_echarts(options={
-        "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
-        "legend": {"data": ["Conversion", "Visit"], "top": 0},
-        "grid": {"left": "3%", "right": "8%", "bottom": "22%", "containLabel": True},
-        "xAxis": {
-            "type": "category",
-            "data": df_sorted["Campaign Name"].tolist(),
-            "axisLabel": {"rotate": 40, "fontSize": 12, "interval": 0},
-        },
-        "yAxis": [
-            {"type": "value", "name": "Conversion"},
-            {"type": "value", "name": "Visit", "splitLine": {"show": False}},
-        ],
-        "series": [
-            {
-                "name": "Conversion",
-                "type": "bar",
-                "barMaxWidth": 35,
-                "data": df_sorted["Conversion"].astype(int).tolist(),
-                "itemStyle": {
-                    "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#91cc75'},{offset:1,color:'#57a661'}])").js_code,
-                    "borderRadius": [4, 4, 0, 0],
-                },
+    with st.container(border=True):
+        df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
+        st_echarts(options={
+            "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
+            "legend": {"data": ["Conversion", "Visit"], "top": 0},
+            "grid": {"left": "3%", "right": "8%", "bottom": "24%", "containLabel": True},
+            "xAxis": {
+                "type": "category",
+                "data": df_sorted["Campaign Name"].tolist(),
+                "axisLabel": {"rotate": 40, "fontSize": 11, "interval": 0, "overflow": "truncate", "width": 80},
             },
-            {
-                "name": "Visit",
-                "type": "line",
-                "yAxisIndex": 1,
-                "smooth": True,
-                "symbol": "circle",
-                "symbolSize": 6,
-                "data": df_sorted["Visit"].astype(int).tolist(),
-                "lineStyle": {"color": "#5470c6", "width": 2},
-                "itemStyle": {"color": "#5470c6"},
-                "areaStyle": {
-                    "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(84,112,198,0.25)'},{offset:1,color:'rgba(84,112,198,0.0)'}])").js_code
+            "yAxis": [
+                {"type": "value", "name": "Conversion"},
+                {"type": "value", "name": "Visit", "splitLine": {"show": False}},
+            ],
+            "series": [
+                {
+                    "name": "Conversion",
+                    "type": "bar",
+                    "barMaxWidth": 35,
+                    "data": df_sorted["Conversion"].astype(int).tolist(),
+                    "itemStyle": {
+                        "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#91cc75'},{offset:1,color:'#57a661'}])").js_code,
+                        "borderRadius": [4, 4, 0, 0],
+                    },
                 },
-            },
-        ],
-    }, height="480px")
+                {
+                    "name": "Visit",
+                    "type": "line",
+                    "yAxisIndex": 1,
+                    "smooth": True,
+                    "symbol": "circle",
+                    "symbolSize": 6,
+                    "data": df_sorted["Visit"].astype(int).tolist(),
+                    "lineStyle": {"color": "#5470c6", "width": 2},
+                    "itemStyle": {"color": "#5470c6"},
+                    "areaStyle": {
+                        "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(84,112,198,0.25)'},{offset:1,color:'rgba(84,112,198,0.0)'}])").js_code
+                    },
+                },
+            ],
+        }, height="480px")
 
 with col_r:
-    brand_cat = filtered_df["Brand Category"].value_counts().reset_index()
-    brand_cat.columns = ["Brand Category", "Count"]
-    st_echarts(options={
-        "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
-        "legend": {"orient": "vertical", "left": "left", "top": "center"},
-        "series": [{
-            "name": "Brand Category",
-            "type": "pie",
-            "radius": ["45%", "72%"],
-            "center": ["62%", "50%"],
-            "avoidLabelOverlap": True,
-            "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
-            "label": {"show": True, "formatter": "{d}%", "fontSize": 13},
-            "emphasis": {
-                "label": {"show": True, "fontSize": 16, "fontWeight": "bold"},
-                "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
-            },
-            "data": [{"value": int(r["Count"]), "name": r["Brand Category"]} for _, r in brand_cat.iterrows()],
-            "color": COLORS,
-        }],
-    }, height="480px")
+    with st.container(border=True):
+        brand_cat = filtered_df["Brand Category"].value_counts().reset_index()
+        brand_cat.columns = ["Brand Category", "Count"]
+        st_echarts(options={
+            "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
+            "legend": {"orient": "vertical", "left": "left", "top": "center"},
+            "series": [{
+                "name": "Brand Category",
+                "type": "pie",
+                "radius": ["45%", "72%"],
+                "center": ["62%", "50%"],
+                "avoidLabelOverlap": True,
+                "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
+                "label": {"show": True, "formatter": "{d}%", "fontSize": 13},
+                "emphasis": {
+                    "label": {"show": True, "fontSize": 16, "fontWeight": "bold"},
+                    "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
+                },
+                "data": [{"value": int(r["Count"]), "name": r["Brand Category"]} for _, r in brand_cat.iterrows()],
+                "color": COLORS,
+            }],
+        }, height="480px")
 
 st.divider()
 
@@ -279,68 +289,71 @@ st.subheader("• Campaign Breakdown")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    ct = filtered_df["Campaign Type"].value_counts().reset_index()
-    ct.columns = ["Campaign Type", "Count"]
-    st_echarts(options={
-        "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-        "grid": {"left": "3%", "right": "15%", "top": "8%", "bottom": "8%", "containLabel": True},
-        "xAxis": {"type": "value"},
-        "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "axisLabel": {"fontSize": 13}},
-        "series": [{
-            "type": "bar",
-            "data": ct["Count"].tolist(),
-            "itemStyle": {
-                "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#73c0de'}])").js_code,
-                "borderRadius": [0, 6, 6, 0],
-            },
-            "label": {"show": True, "position": "right", "fontSize": 13},
-        }],
-    }, height="370px")
+    with st.container(border=True):
+        ct = filtered_df["Campaign Type"].value_counts().reset_index()
+        ct.columns = ["Campaign Type", "Count"]
+        st_echarts(options={
+            "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+            "grid": {"left": "3%", "right": "15%", "top": "8%", "bottom": "8%", "containLabel": True},
+            "xAxis": {"type": "value"},
+            "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "axisLabel": {"fontSize": 13}},
+            "series": [{
+                "type": "bar",
+                "data": ct["Count"].tolist(),
+                "itemStyle": {
+                    "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#73c0de'}])").js_code,
+                    "borderRadius": [0, 6, 6, 0],
+                },
+                "label": {"show": True, "position": "right", "fontSize": 13},
+            }],
+        }, height="370px")
 
 with col2:
-    brand = filtered_df["Brand"].value_counts().reset_index()
-    brand.columns = ["Brand", "Count"]
-    st_echarts(options={
-        "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
-        "legend": {"orient": "vertical", "left": "left", "top": "center", "textStyle": {"fontSize": 12}},
-        "series": [{
-            "name": "Brand",
-            "type": "pie",
-            "radius": ["45%", "72%"],
-            "center": ["65%", "50%"],
-            "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
-            "label": {"show": False},
-            "emphasis": {
-                "label": {"show": True, "fontSize": 15, "fontWeight": "bold"},
-                "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
-            },
-            "data": [{"value": int(r["Count"]), "name": r["Brand"]} for _, r in brand.iterrows()],
-            "color": COLORS,
-        }],
-    }, height="370px")
+    with st.container(border=True):
+        brand = filtered_df["Brand"].value_counts().reset_index()
+        brand.columns = ["Brand", "Count"]
+        st_echarts(options={
+            "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
+            "legend": {"orient": "vertical", "left": "left", "top": "center", "textStyle": {"fontSize": 12}},
+            "series": [{
+                "name": "Brand",
+                "type": "pie",
+                "radius": ["45%", "72%"],
+                "center": ["65%", "50%"],
+                "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
+                "label": {"show": False},
+                "emphasis": {
+                    "label": {"show": True, "fontSize": 15, "fontWeight": "bold"},
+                    "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
+                },
+                "data": [{"value": int(r["Count"]), "name": r["Brand"]} for _, r in brand.iterrows()],
+                "color": COLORS,
+            }],
+        }, height="370px")
 
 with col3:
-    prize = filtered_df.groupby("Big Prize")["Conversion"].sum().reset_index()
-    prize = prize.sort_values("Conversion", ascending=False)
-    st_echarts(options={
-        "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-        "grid": {"left": "3%", "right": "5%", "top": "12%", "bottom": "20%", "containLabel": True},
-        "xAxis": {
-            "type": "category",
-            "data": prize["Big Prize"].tolist(),
-            "axisLabel": {"rotate": 25, "fontSize": 12},
-        },
-        "yAxis": {"type": "value"},
-        "series": [{
-            "type": "bar",
-            "data": prize["Conversion"].astype(int).tolist(),
-            "itemStyle": {
-                "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#fac858'},{offset:1,color:'#fc8452'}])").js_code,
-                "borderRadius": [4, 4, 0, 0],
+    with st.container(border=True):
+        prize = filtered_df.groupby("Big Prize")["Conversion"].sum().reset_index()
+        prize = prize.sort_values("Conversion", ascending=False)
+        st_echarts(options={
+            "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+            "grid": {"left": "3%", "right": "5%", "top": "12%", "bottom": "20%", "containLabel": True},
+            "xAxis": {
+                "type": "category",
+                "data": prize["Big Prize"].tolist(),
+                "axisLabel": {"rotate": 25, "fontSize": 12},
             },
-            "label": {"show": True, "position": "top", "fontSize": 12},
-        }],
-    }, height="370px")
+            "yAxis": {"type": "value"},
+            "series": [{
+                "type": "bar",
+                "data": prize["Conversion"].astype(int).tolist(),
+                "itemStyle": {
+                    "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#fac858'},{offset:1,color:'#fc8452'}])").js_code,
+                    "borderRadius": [4, 4, 0, 0],
+                },
+                "label": {"show": True, "position": "top", "fontSize": 12},
+            }],
+        }, height="370px")
 
 st.divider()
 
@@ -354,60 +367,62 @@ col_labels[1].subheader("• Campaign Ranking")
 col_l, col_r = st.columns([3, 2])
 
 with col_l:
-    feat = (
-        filtered_df.groupby("Campaign Key Features")["Visit"]
-        .sum().reset_index().sort_values("Visit", ascending=False)
-    )
-    st_echarts(options={
-        "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-        "grid": {"left": "3%", "right": "5%", "top": "8%", "bottom": "22%", "containLabel": True},
-        "xAxis": {
-            "type": "category",
-            "data": feat["Campaign Key Features"].tolist(),
-            "axisLabel": {"rotate": 30, "fontSize": 12},
-        },
-        "yAxis": {"type": "value"},
-        "series": [{
-            "type": "bar",
-            "data": feat["Visit"].astype(int).tolist(),
-            "itemStyle": {
-                "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#73c0de'},{offset:1,color:'#5470c6'}])").js_code,
-                "borderRadius": [4, 4, 0, 0],
+    with st.container(border=True):
+        feat = (
+            filtered_df.groupby("Campaign Key Features")["Visit"]
+            .sum().reset_index().sort_values("Visit", ascending=False)
+        )
+        st_echarts(options={
+            "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+            "grid": {"left": "3%", "right": "5%", "top": "8%", "bottom": "22%", "containLabel": True},
+            "xAxis": {
+                "type": "category",
+                "data": feat["Campaign Key Features"].tolist(),
+                "axisLabel": {"rotate": 30, "fontSize": 12},
             },
-            "emphasis": {"itemStyle": {"shadowBlur": 8, "shadowColor": "rgba(0,0,0,0.15)"}},
-            "label": {"show": True, "position": "top", "fontSize": 12},
-        }],
-    }, height="390px")
+            "yAxis": {"type": "value"},
+            "series": [{
+                "type": "bar",
+                "data": feat["Visit"].astype(int).tolist(),
+                "itemStyle": {
+                    "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#73c0de'},{offset:1,color:'#5470c6'}])").js_code,
+                    "borderRadius": [4, 4, 0, 0],
+                },
+                "emphasis": {"itemStyle": {"shadowBlur": 8, "shadowColor": "rgba(0,0,0,0.15)"}},
+                "label": {"show": True, "position": "top", "fontSize": 12},
+            }],
+        }, height="390px")
 
 with col_r:
-    ranking = (
-        filtered_df.sort_values("Conversion Rate", ascending=False)
-        .head(10)[["Campaign Name", "Conversion Rate"]]
-        .reset_index(drop=True)
-    )
-    st_echarts(options={
-        "tooltip": {
-            "trigger": "axis",
-            "axisPointer": {"type": "shadow"},
-            "formatter": JsCode("function(p){return p[0].name + '<br/>Conversion Rate: <b>' + p[0].value + '%</b>'}").js_code,
-        },
-        "grid": {"left": "3%", "right": "18%", "top": "3%", "bottom": "3%", "containLabel": True},
-        "xAxis": {"type": "value", "axisLabel": {"formatter": "{value}%"}},
-        "yAxis": {
-            "type": "category",
-            "data": ranking["Campaign Name"].tolist()[::-1],
-            "axisLabel": {"fontSize": 12, "width": 120, "overflow": "truncate"},
-        },
-        "series": [{
-            "type": "bar",
-            "data": ranking["Conversion Rate"].round(2).tolist()[::-1],
-            "itemStyle": {
-                "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#91cc75'}])").js_code,
-                "borderRadius": [0, 6, 6, 0],
+    with st.container(border=True):
+        ranking = (
+            filtered_df.sort_values("Conversion Rate", ascending=False)
+            .head(10)[["Campaign Name", "Conversion Rate"]]
+            .reset_index(drop=True)
+        )
+        st_echarts(options={
+            "tooltip": {
+                "trigger": "axis",
+                "axisPointer": {"type": "shadow"},
+                "formatter": JsCode("function(p){return p[0].name + '<br/>Conversion Rate: <b>' + p[0].value + '%</b>'}").js_code,
             },
-            "label": {"show": True, "position": "right", "fontSize": 12, "formatter": "{c}%"},
-        }],
-    }, height="390px")
+            "grid": {"left": "3%", "right": "18%", "top": "3%", "bottom": "3%", "containLabel": True},
+            "xAxis": {"type": "value", "axisLabel": {"formatter": "{value}%"}},
+            "yAxis": {
+                "type": "category",
+                "data": ranking["Campaign Name"].tolist()[::-1],
+                "axisLabel": {"fontSize": 12, "width": 120, "overflow": "truncate"},
+            },
+            "series": [{
+                "type": "bar",
+                "data": ranking["Conversion Rate"].round(2).tolist()[::-1],
+                "itemStyle": {
+                    "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#91cc75'}])").js_code,
+                    "borderRadius": [0, 6, 6, 0],
+                },
+                "label": {"show": True, "position": "right", "fontSize": 12, "formatter": "{c}%"},
+            }],
+        }, height="390px")
 
 st.divider()
 
@@ -416,29 +431,30 @@ st.divider()
 # -------------------------
 st.subheader("• Campaign Timeline")
 
-tl_df = filtered_df.copy()
-tl_df["End Date"] = tl_df["End Date"].replace("-", now_str)
-tl_df["Start Date"] = pd.to_datetime(tl_df["Start Date"], errors="coerce")
-tl_df["End Date"] = pd.to_datetime(tl_df["End Date"])
+with st.container(border=True):
+    tl_df = filtered_df.copy()
+    tl_df["End Date"] = tl_df["End Date"].replace("-", now_str)
+    tl_df["Start Date"] = pd.to_datetime(tl_df["Start Date"], errors="coerce")
+    tl_df["End Date"] = pd.to_datetime(tl_df["End Date"])
 
-fig = px.timeline(
-    tl_df,
-    x_start="Start Date", x_end="End Date",
-    y="Campaign Name", color="Brand",
-    color_discrete_sequence=COLORS,
-)
-fig.update_yaxes(autorange="reversed")
-fig.update_layout(
-    height=520,
-    margin=dict(t=30, b=10),
-    plot_bgcolor="rgba(0,0,0,0)",
-    paper_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="sans-serif", size=14),
-    legend=dict(orientation="h", yanchor="bottom", y=1.02),
-)
-fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
-fig.update_yaxes(showgrid=False)
-st.plotly_chart(fig, use_container_width=True)
+    fig = px.timeline(
+        tl_df,
+        x_start="Start Date", x_end="End Date",
+        y="Campaign Name", color="Brand",
+        color_discrete_sequence=COLORS,
+    )
+    fig.update_yaxes(autorange="reversed")
+    fig.update_layout(
+        height=520,
+        margin=dict(t=30, b=10),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="sans-serif", size=14),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+    )
+    fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+    fig.update_yaxes(showgrid=False)
+    st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
 
@@ -446,4 +462,5 @@ st.divider()
 # ROW 6: Overview Table
 # -------------------------
 st.subheader("• Overview Table")
-st.dataframe(filtered_df, use_container_width=True)
+with st.container(border=True):
+    st.dataframe(filtered_df, use_container_width=True)
