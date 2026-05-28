@@ -495,14 +495,16 @@ with st.container(border=True):
     tl_df["End Date"] = tl_df["End Date"].replace("-", now_str)
     tl_df["Start Date Ts"] = pd.to_datetime(tl_df["Start Date"], errors="coerce")
     tl_df["End Date Ts"] = pd.to_datetime(tl_df["End Date"], errors="coerce")
+
+    n_total    = len(filtered_df)
+    n_upcoming = int((filtered_df["Start Date"] == "-").sum())
+
     tl_df = tl_df.dropna(subset=["Start Date Ts", "End Date Ts"])
 
     if not tl_df.empty:
-        today = pd.Timestamp.now().normalize()
-        n_total   = len(tl_df)
+        today     = pd.Timestamp.now().normalize()
         n_running = int(((tl_df["Start Date Ts"] <= today) & (tl_df["End Date Ts"] >= today)).sum())
         n_closed  = int((tl_df["End Date Ts"] < today).sum())
-        n_upcoming= int((tl_df["Start Date Ts"] > today).sum())
 
         st.markdown(f"""
         <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
