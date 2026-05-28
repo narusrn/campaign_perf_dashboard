@@ -72,6 +72,16 @@ section[data-testid="stSidebar"] .stDateInput label {
     border: 1px solid #e2e8f0 !important;
     background: white !important;
     overflow: hidden;
+    height: 100% !important;
+    box-sizing: border-box !important;
+}
+
+[data-testid="stHorizontalBlock"] {
+    align-items: stretch !important;
+}
+
+[data-testid="column"] > div:first-child {
+    height: 100% !important;
 }
 
 @media print {
