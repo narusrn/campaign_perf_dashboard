@@ -142,7 +142,7 @@ with st.sidebar:
 with open(logo_path, "rb") as f:
     logo_b64 = base64.b64encode(f.read()).decode()
 st.markdown(
-    f'<div style="display:flex;align-items:center;gap:14px;padding:28px 0 12px 0;">'
+    f'<div style="display:flex;align-items:center;gap:14px;padding:48px 0 12px 0;">'
     f'<img src="data:image/png;base64,{logo_b64}" style="height:52px;width:auto;">'
     f'<div>'
     f'<div style="font-size:2rem;font-weight:800;color:#1e293b;line-height:1.1;'
