@@ -12,7 +12,7 @@ st.set_page_config(layout="wide", page_title="Campaign Performance")
 def img_to_html(path, height=50):
     with open(path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-    return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px;width:auto;display:block;margin-top:12px;">'
+    return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px;width:auto;display:block;">'
 
 COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#fc8452", "#9a60b4", "#ea7ccc"]
 
@@ -128,11 +128,15 @@ with st.sidebar:
 # -------------------------
 # HEADER
 # -------------------------
-col_logo, col_title = st.columns([1, 10])
-with col_logo:
-    st.markdown(img_to_html(logo_path, height=50), unsafe_allow_html=True)
-with col_title:
-    st.title("Campaign Performance Dashboard")
+with open(logo_path, "rb") as f:
+    logo_b64 = base64.b64encode(f.read()).decode()
+st.markdown(
+    f'<div style="display:flex;align-items:center;gap:10px;padding:18px 0 8px 0;">'
+    f'<img src="data:image/png;base64,{logo_b64}" style="height:44px;width:auto;">'
+    f'<span style="font-size:2rem;font-weight:700;line-height:1.2;">Campaign Performance Dashboard</span>'
+    f'</div>',
+    unsafe_allow_html=True,
+)
 
 # -------------------------
 # FILTER LOGIC
