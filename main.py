@@ -308,7 +308,7 @@ with col_l:
                     },
                 },
             ],
-        }, height="330px")
+        }, height="400px")
 
 with col_r:
     with st.container(border=True):
