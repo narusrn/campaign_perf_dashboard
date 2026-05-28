@@ -215,9 +215,10 @@ with col_l:
     with st.container(border=True):
         df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
         st_echarts(options={
+            "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
-            "legend": {"data": ["Conversion", "Visit"], "top": 0},
-            "grid": {"left": "3%", "right": "8%", "bottom": "24%", "containLabel": True},
+            "legend": {"data": ["Conversion", "Visit"], "top": 28},
+            "grid": {"left": "3%", "right": "8%", "bottom": "24%", "top": "14%", "containLabel": True},
             "xAxis": {
                 "type": "category",
                 "data": df_sorted["Campaign Name"].tolist(),
@@ -260,6 +261,7 @@ with col_r:
         brand_cat = filtered_df["Brand Category"].value_counts().reset_index()
         brand_cat.columns = ["Brand Category", "Count"]
         st_echarts(options={
+            "title": {"text": "Brand Category Mix", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
             "legend": {"orient": "vertical", "left": "left", "top": "center"},
             "series": [{
@@ -293,9 +295,10 @@ with col1:
         ct = filtered_df["Campaign Type"].value_counts().reset_index()
         ct.columns = ["Campaign Type", "Count"]
         st_echarts(options={
+            "title": {"text": "By Campaign Type", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-            "grid": {"left": "3%", "right": "15%", "top": "8%", "bottom": "8%", "containLabel": True},
-            "xAxis": {"type": "value"},
+            "grid": {"left": "3%", "right": "15%", "top": "16%", "bottom": "8%", "containLabel": True},
+            "xAxis": {"type": "value", "name": "Campaigns", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
             "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "axisLabel": {"fontSize": 13}},
             "series": [{
                 "type": "bar",
@@ -313,8 +316,9 @@ with col2:
         brand = filtered_df["Brand"].value_counts().reset_index()
         brand.columns = ["Brand", "Count"]
         st_echarts(options={
+            "title": {"text": "By Brand", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
-            "legend": {"orient": "vertical", "left": "left", "top": "center", "textStyle": {"fontSize": 12}},
+            "legend": {"orient": "vertical", "left": "left", "top": "middle", "textStyle": {"fontSize": 12}},
             "series": [{
                 "name": "Brand",
                 "type": "pie",
@@ -336,14 +340,15 @@ with col3:
         prize = filtered_df.groupby("Big Prize")["Conversion"].sum().reset_index()
         prize = prize.sort_values("Conversion", ascending=False)
         st_echarts(options={
+            "title": {"text": "Conversions by Prize Theme", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-            "grid": {"left": "3%", "right": "5%", "top": "12%", "bottom": "20%", "containLabel": True},
+            "grid": {"left": "3%", "right": "5%", "top": "18%", "bottom": "20%", "containLabel": True},
             "xAxis": {
                 "type": "category",
                 "data": prize["Big Prize"].tolist(),
                 "axisLabel": {"rotate": 25, "fontSize": 12},
             },
-            "yAxis": {"type": "value"},
+            "yAxis": {"type": "value", "name": "Conversions", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
             "series": [{
                 "type": "bar",
                 "data": prize["Conversion"].astype(int).tolist(),
@@ -380,7 +385,7 @@ with col_l:
                 "data": feat["Campaign Key Features"].tolist(),
                 "axisLabel": {"rotate": 30, "fontSize": 12},
             },
-            "yAxis": {"type": "value"},
+            "yAxis": {"type": "value", "name": "Total Visits", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
             "series": [{
                 "type": "bar",
                 "data": feat["Visit"].astype(int).tolist(),
@@ -407,7 +412,7 @@ with col_r:
                 "formatter": JsCode("function(p){return p[0].name + '<br/>Conversion Rate: <b>' + p[0].value + '%</b>'}").js_code,
             },
             "grid": {"left": "3%", "right": "18%", "top": "3%", "bottom": "3%", "containLabel": True},
-            "xAxis": {"type": "value", "axisLabel": {"formatter": "{value}%"}},
+            "xAxis": {"type": "value", "name": "Conversion Rate (%)", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}, "axisLabel": {"formatter": "{value}%"}},
             "yAxis": {
                 "type": "category",
                 "data": ranking["Campaign Name"].tolist()[::-1],
