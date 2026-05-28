@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import base64
 from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
@@ -493,27 +492,78 @@ st.subheader("• Campaign Timeline")
 with st.container(border=True):
     tl_df = filtered_df.copy()
     tl_df["End Date"] = tl_df["End Date"].replace("-", now_str)
-    tl_df["Start Date"] = pd.to_datetime(tl_df["Start Date"], errors="coerce")
-    tl_df["End Date"] = pd.to_datetime(tl_df["End Date"])
+    tl_df["Start Date Ts"] = pd.to_datetime(tl_df["Start Date"], errors="coerce")
+    tl_df["End Date Ts"] = pd.to_datetime(tl_df["End Date"], errors="coerce")
+    tl_df = tl_df.dropna(subset=["Start Date Ts", "End Date Ts"])
 
-    fig = px.timeline(
-        tl_df,
-        x_start="Start Date", x_end="End Date",
-        y="Campaign Name", color="Brand",
-        color_discrete_sequence=COLORS,
-    )
-    fig.update_yaxes(autorange="reversed")
-    fig.update_layout(
-        height=520,
-        margin=dict(t=30, b=10),
-        plot_bgcolor="white",
-        paper_bgcolor="white",
-        font=dict(family="sans-serif", size=14),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02),
-    )
-    fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
-    fig.update_yaxes(showgrid=False)
-    st.plotly_chart(fig, use_container_width=True)
+    if not tl_df.empty:
+        campaigns_order = tl_df["Campaign Name"].unique().tolist()
+        brands_list = tl_df["Brand"].dropna().unique().tolist()
+
+        render_item = JsCode("""
+        function(params, api) {
+            var idx   = api.value(0);
+            var start = api.coord([api.value(1), idx]);
+            var end   = api.coord([api.value(2), idx]);
+            var h     = api.size([0, 1])[1] * 0.55;
+            return {
+                type: 'rect',
+                shape: { x: start[0], y: start[1] - h / 2,
+                         width: Math.max(end[0] - start[0], 2), height: h },
+                style: api.style()
+            };
+        }
+        """).js_code
+
+        tooltip_fmt = JsCode("""
+        function(params) {
+            var s = new Date(params.value[1]);
+            var e = new Date(params.value[2]);
+            var months = ['Jan','Feb','Mar','Apr','May','Jun',
+                          'Jul','Aug','Sep','Oct','Nov','Dec'];
+            var fmt = function(d) {
+                return ('0'+d.getDate()).slice(-2) + ' ' +
+                       months[d.getMonth()] + ' ' + d.getFullYear();
+            };
+            return '<b>' + params.value[3] + '</b><br/>' +
+                   'Brand: ' + params.seriesName + '<br/>' +
+                   'Start: ' + fmt(s) + '<br/>' +
+                   'End: '   + fmt(e);
+        }
+        """).js_code
+
+        series = []
+        for i, brand in enumerate(brands_list):
+            bdf = tl_df[tl_df["Brand"] == brand]
+            data = []
+            for _, row in bdf.iterrows():
+                data.append({"value": [
+                    campaigns_order.index(row["Campaign Name"]),
+                    int(row["Start Date Ts"].timestamp() * 1000),
+                    int(row["End Date Ts"].timestamp() * 1000),
+                    row["Campaign Name"],
+                ]})
+            series.append({
+                "type": "custom",
+                "name": brand,
+                "renderItem": render_item,
+                "itemStyle": {"color": COLORS[i % len(COLORS)]},
+                "encode": {"x": [1, 2], "y": 0},
+                "data": data,
+            })
+
+        st_echarts(options={
+            "tooltip": {"formatter": tooltip_fmt},
+            "legend": {"data": brands_list, "top": 4, "type": "scroll", "textStyle": {"fontSize": 12}},
+            "grid": {"left": "2%", "right": "2%", "top": "12%", "bottom": "4%", "containLabel": True},
+            "xAxis": {"type": "time", "axisLabel": {"fontSize": 11}},
+            "yAxis": {
+                "type": "category",
+                "data": campaigns_order[::-1],
+                "axisLabel": {"fontSize": 11, "width": 160, "overflow": "truncate"},
+            },
+            "series": series,
+        }, height="520px")
 
 st.divider()
 
