@@ -498,6 +498,41 @@ with st.container(border=True):
     tl_df = tl_df.dropna(subset=["Start Date Ts", "End Date Ts"])
 
     if not tl_df.empty:
+        today = pd.Timestamp.now().normalize()
+        n_total   = len(tl_df)
+        n_running = int(((tl_df["Start Date Ts"] <= today) & (tl_df["End Date Ts"] >= today)).sum())
+        n_closed  = int((tl_df["End Date Ts"] < today).sum())
+        n_upcoming= int((tl_df["Start Date Ts"] > today).sum())
+
+        st.markdown(f"""
+        <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:110px;background:#f8fafc;border:1px solid #e2e8f0;
+                        border-radius:10px;padding:12px 16px;">
+                <div style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;
+                            letter-spacing:0.08em;">Total</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#1e293b;line-height:1.1;">{n_total}</div>
+            </div>
+            <div style="flex:1;min-width:110px;background:#f0fdf4;border:1px solid #bbf7d0;
+                        border-radius:10px;padding:12px 16px;">
+                <div style="font-size:0.7rem;font-weight:700;color:#16a34a;text-transform:uppercase;
+                            letter-spacing:0.08em;">Running</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#15803d;line-height:1.1;">{n_running}</div>
+            </div>
+            <div style="flex:1;min-width:110px;background:#fff7ed;border:1px solid #fed7aa;
+                        border-radius:10px;padding:12px 16px;">
+                <div style="font-size:0.7rem;font-weight:700;color:#ea580c;text-transform:uppercase;
+                            letter-spacing:0.08em;">Upcoming</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#c2410c;line-height:1.1;">{n_upcoming}</div>
+            </div>
+            <div style="flex:1;min-width:110px;background:#f8fafc;border:1px solid #e2e8f0;
+                        border-radius:10px;padding:12px 16px;">
+                <div style="font-size:0.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;
+                            letter-spacing:0.08em;">Closed</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#64748b;line-height:1.1;">{n_closed}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
         campaigns_order = tl_df["Campaign Name"].unique().tolist()
         brands_list = tl_df["Brand"].dropna().unique().tolist()
 
