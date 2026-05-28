@@ -21,11 +21,11 @@ st.markdown("""
     .block-container { padding-top: 1rem; padding-bottom: 1rem; }
 
     [data-testid="stMetricValue"] {
-        font-size: 2.3rem !important;
+        font-size: 2.6rem !important;
         font-weight: 700 !important;
     }
     [data-testid="stMetricLabel"] {
-        font-size: 0.85rem !important;
+        font-size: 0.95rem !important;
         font-weight: 600 !important;
         text-transform: uppercase;
         letter-spacing: 0.07em;
@@ -33,7 +33,7 @@ st.markdown("""
     }
 
     h3 {
-        font-size: 0.95rem !important;
+        font-size: 1.05rem !important;
         font-weight: 700 !important;
         text-transform: uppercase;
         letter-spacing: 0.09em;
@@ -47,7 +47,7 @@ st.markdown("""
     section[data-testid="stSidebar"] h3 { color: #5470c6 !important; }
     section[data-testid="stSidebar"] .stMultiSelect label,
     section[data-testid="stSidebar"] .stDateInput label {
-        font-size: 0.8rem !important;
+        font-size: 0.9rem !important;
         font-weight: 600 !important;
         opacity: 0.8;
     }
@@ -194,7 +194,7 @@ with col_l:
         "xAxis": {
             "type": "category",
             "data": df_sorted["Campaign Name"].tolist(),
-            "axisLabel": {"rotate": 40, "fontSize": 10, "interval": 0},
+            "axisLabel": {"rotate": 40, "fontSize": 12, "interval": 0},
         },
         "yAxis": [
             {"type": "value", "name": "Conversion"},
@@ -241,9 +241,9 @@ with col_r:
             "center": ["62%", "50%"],
             "avoidLabelOverlap": True,
             "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
-            "label": {"show": True, "formatter": "{d}%", "fontSize": 11},
+            "label": {"show": True, "formatter": "{d}%", "fontSize": 13},
             "emphasis": {
-                "label": {"show": True, "fontSize": 14, "fontWeight": "bold"},
+                "label": {"show": True, "fontSize": 16, "fontWeight": "bold"},
                 "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
             },
             "data": [{"value": int(r["Count"]), "name": r["Brand Category"]} for _, r in brand_cat.iterrows()],
@@ -267,7 +267,7 @@ with col1:
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
         "grid": {"left": "3%", "right": "15%", "top": "8%", "bottom": "8%", "containLabel": True},
         "xAxis": {"type": "value"},
-        "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "axisLabel": {"fontSize": 11}},
+        "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "axisLabel": {"fontSize": 13}},
         "series": [{
             "type": "bar",
             "data": ct["Count"].tolist(),
@@ -275,7 +275,7 @@ with col1:
                 "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#73c0de'}])").js_code,
                 "borderRadius": [0, 6, 6, 0],
             },
-            "label": {"show": True, "position": "right", "fontSize": 11},
+            "label": {"show": True, "position": "right", "fontSize": 13},
         }],
     }, height="370px")
 
@@ -284,7 +284,7 @@ with col2:
     brand.columns = ["Brand", "Count"]
     st_echarts(options={
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
-        "legend": {"orient": "vertical", "left": "left", "top": "center", "textStyle": {"fontSize": 10}},
+        "legend": {"orient": "vertical", "left": "left", "top": "center", "textStyle": {"fontSize": 12}},
         "series": [{
             "name": "Brand",
             "type": "pie",
@@ -293,7 +293,7 @@ with col2:
             "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
             "label": {"show": False},
             "emphasis": {
-                "label": {"show": True, "fontSize": 13, "fontWeight": "bold"},
+                "label": {"show": True, "fontSize": 15, "fontWeight": "bold"},
                 "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
             },
             "data": [{"value": int(r["Count"]), "name": r["Brand"]} for _, r in brand.iterrows()],
@@ -310,7 +310,7 @@ with col3:
         "xAxis": {
             "type": "category",
             "data": prize["Big Prize"].tolist(),
-            "axisLabel": {"rotate": 25, "fontSize": 10},
+            "axisLabel": {"rotate": 25, "fontSize": 12},
         },
         "yAxis": {"type": "value"},
         "series": [{
@@ -320,7 +320,7 @@ with col3:
                 "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#fac858'},{offset:1,color:'#fc8452'}])").js_code,
                 "borderRadius": [4, 4, 0, 0],
             },
-            "label": {"show": True, "position": "top", "fontSize": 10},
+            "label": {"show": True, "position": "top", "fontSize": 12},
         }],
     }, height="370px")
 
@@ -346,7 +346,7 @@ with col_l:
         "xAxis": {
             "type": "category",
             "data": feat["Campaign Key Features"].tolist(),
-            "axisLabel": {"rotate": 30, "fontSize": 10},
+            "axisLabel": {"rotate": 30, "fontSize": 12},
         },
         "yAxis": {"type": "value"},
         "series": [{
@@ -357,7 +357,7 @@ with col_l:
                 "borderRadius": [4, 4, 0, 0],
             },
             "emphasis": {"itemStyle": {"shadowBlur": 8, "shadowColor": "rgba(0,0,0,0.15)"}},
-            "label": {"show": True, "position": "top", "fontSize": 10},
+            "label": {"show": True, "position": "top", "fontSize": 12},
         }],
     }, height="390px")
 
@@ -378,7 +378,7 @@ with col_r:
         "yAxis": {
             "type": "category",
             "data": ranking["Campaign Name"].tolist()[::-1],
-            "axisLabel": {"fontSize": 10, "width": 120, "overflow": "truncate"},
+            "axisLabel": {"fontSize": 12, "width": 120, "overflow": "truncate"},
         },
         "series": [{
             "type": "bar",
@@ -387,7 +387,7 @@ with col_r:
                 "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#91cc75'}])").js_code,
                 "borderRadius": [0, 6, 6, 0],
             },
-            "label": {"show": True, "position": "right", "fontSize": 10, "formatter": "{c}%"},
+            "label": {"show": True, "position": "right", "fontSize": 12, "formatter": "{c}%"},
         }],
     }, height="390px")
 
@@ -415,7 +415,7 @@ fig.update_layout(
     margin=dict(t=30, b=10),
     plot_bgcolor="rgba(0,0,0,0)",
     paper_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="sans-serif", size=12),
+    font=dict(family="sans-serif", size=14),
     legend=dict(orientation="h", yanchor="bottom", y=1.02),
 )
 fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
