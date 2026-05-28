@@ -1,12 +1,18 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import base64
 from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
 
 now_str = datetime.now().strftime("%d-%b-%y")
 
 st.set_page_config(layout="wide", page_title="Campaign Performance")
+
+def img_to_html(path, height=50):
+    with open(path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px;width:auto;display:block;">'
 
 COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#fc8452", "#9a60b4", "#ea7ccc"]
 
@@ -46,17 +52,6 @@ st.markdown("""
         opacity: 0.8;
     }
 
-    /* Logo: same height as h1, vertically centered */
-    [data-testid="stImage"] img {
-        max-height: 52px !important;
-        width: auto !important;
-        object-fit: contain;
-    }
-    [data-testid="column"]:first-child {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -135,7 +130,7 @@ with st.sidebar:
 # -------------------------
 col_logo, col_title = st.columns([1, 10])
 with col_logo:
-    st.image(logo_path, use_container_width=True)
+    st.markdown(img_to_html(logo_path, height=50), unsafe_allow_html=True)
 with col_title:
     st.title("Campaign Performance Dashboard")
 
@@ -335,7 +330,9 @@ st.divider()
 # -------------------------
 # ROW 4: Key Features (3) | Campaign Ranking (2)
 # -------------------------
-st.subheader("• Campaign Performance Details")
+col_labels = st.columns([3, 2])
+col_labels[0].subheader("• Campaign Key Features vs Visit")
+col_labels[1].subheader("• Campaign Ranking")
 
 col_l, col_r = st.columns([3, 2])
 
@@ -366,7 +363,6 @@ with col_l:
     }, height="390px")
 
 with col_r:
-    st.subheader("• Campaign Ranking")
     ranking = (
         filtered_df.sort_values("Conversion Rate", ascending=False)
         .head(10)[["Campaign Name", "Conversion Rate"]]
