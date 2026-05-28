@@ -272,7 +272,7 @@ with col_l:
             "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
             "legend": {"data": ["Conversion", "Visit"], "top": 28},
-            "grid": {"left": "3%", "right": "8%", "bottom": "24%", "top": "14%", "containLabel": True},
+            "grid": {"left": "3%", "right": "8%", "bottom": "16%", "top": "14%", "containLabel": True},
             "xAxis": {
                 "type": "category",
                 "data": df_sorted["Campaign Name"].tolist(),
@@ -308,7 +308,7 @@ with col_l:
                     },
                 },
             ],
-        }, height="400px")
+        }, height="330px")
 
 with col_r:
     with st.container(border=True):
