@@ -121,9 +121,9 @@ with st.sidebar:
 # -------------------------
 # HEADER
 # -------------------------
-col_logo, col_title = st.columns([1, 8])
+col_logo, col_title = st.columns([1, 6])
 with col_logo:
-    st.image(logo_path, width=80)
+    st.image(logo_path, use_container_width=True)
 with col_title:
     st.title("Campaign Performance Dashboard")
 
@@ -220,7 +220,7 @@ with col_l:
                 },
             },
         ],
-    }, height="400px")
+    }, height="420px")
 
 with col_r:
     brand_cat = filtered_df["Brand Category"].value_counts().reset_index()
@@ -243,7 +243,7 @@ with col_r:
             "data": [{"value": int(r["Count"]), "name": r["Brand Category"]} for _, r in brand_cat.iterrows()],
             "color": COLORS,
         }],
-    }, height="400px")
+    }, height="420px")
 
 st.divider()
 
@@ -259,7 +259,7 @@ with col1:
     ct.columns = ["Campaign Type", "Count"]
     st_echarts(options={
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-        "grid": {"left": "3%", "right": "15%", "top": "5%", "bottom": "5%", "containLabel": True},
+        "grid": {"left": "3%", "right": "15%", "top": "8%", "bottom": "8%", "containLabel": True},
         "xAxis": {"type": "value"},
         "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "axisLabel": {"fontSize": 11}},
         "series": [{
@@ -271,7 +271,7 @@ with col1:
             },
             "label": {"show": True, "position": "right", "fontSize": 11},
         }],
-    }, height="320px")
+    }, height="370px")
 
 with col2:
     brand = filtered_df["Brand"].value_counts().reset_index()
@@ -293,14 +293,14 @@ with col2:
             "data": [{"value": int(r["Count"]), "name": r["Brand"]} for _, r in brand.iterrows()],
             "color": COLORS,
         }],
-    }, height="320px")
+    }, height="370px")
 
 with col3:
     prize = filtered_df.groupby("Big Prize")["Conversion"].sum().reset_index()
     prize = prize.sort_values("Conversion", ascending=False)
     st_echarts(options={
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-        "grid": {"left": "3%", "right": "5%", "top": "8%", "bottom": "18%", "containLabel": True},
+        "grid": {"left": "3%", "right": "5%", "top": "12%", "bottom": "20%", "containLabel": True},
         "xAxis": {
             "type": "category",
             "data": prize["Big Prize"].tolist(),
@@ -316,7 +316,7 @@ with col3:
             },
             "label": {"show": True, "position": "top", "fontSize": 10},
         }],
-    }, height="320px")
+    }, height="370px")
 
 st.divider()
 
@@ -351,7 +351,7 @@ with col_l:
             "emphasis": {"itemStyle": {"shadowBlur": 8, "shadowColor": "rgba(0,0,0,0.15)"}},
             "label": {"show": True, "position": "top", "fontSize": 10},
         }],
-    }, height="340px")
+    }, height="390px")
 
 with col_r:
     st.subheader("• Campaign Ranking")
@@ -361,7 +361,7 @@ with col_r:
         ].reset_index(drop=True)
     )
     ranking.index += 1
-    st.dataframe(ranking, use_container_width=True, height=310)
+    st.dataframe(ranking, use_container_width=True, height=350)
 
 st.divider()
 
