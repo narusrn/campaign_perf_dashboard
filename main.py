@@ -557,7 +557,16 @@ with st.container(border=True):
             "tooltip": {"formatter": tooltip_fmt},
             "legend": {"data": brands_list, "top": 4, "type": "scroll", "textStyle": {"fontSize": 12}},
             "grid": {"left": "2%", "right": "2%", "top": "12%", "bottom": "4%", "containLabel": True},
-            "xAxis": {"type": "time", "axisLabel": {"fontSize": 11}},
+            "xAxis": {
+                "type": "time",
+                "axisLabel": {"fontSize": 11},
+                "minInterval": 28 * 24 * 3600 * 1000,
+                "maxInterval": 31 * 24 * 3600 * 1000,
+                "splitLine": {
+                    "show": True,
+                    "lineStyle": {"type": "dashed", "color": "#cbd5e1", "width": 1},
+                },
+            },
             "yAxis": {
                 "type": "category",
                 "data": campaigns_order[::-1],
