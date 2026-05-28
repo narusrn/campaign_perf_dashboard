@@ -53,6 +53,12 @@ df["Conversion Rate"] = (
     )
 )
 
+df["Start Date Parsed"] = pd.to_datetime(
+    df["Start Date"].replace("-", pd.NaT),
+    format="%d-%b-%y",
+    errors="coerce"
+)
+
 # -------------------------
 # HEADER
 # -------------------------
@@ -89,10 +95,36 @@ with st.sidebar:
         default=df["Campaign Type"].dropna().unique()
     )
 
+    st.divider()
+    st.subheader("• Date Range")
+    valid_dates = df["Start Date Parsed"].dropna()
+    min_date = valid_dates.min().date()
+    max_date = valid_dates.max().date()
+    date_range = st.date_input(
+        "Start Date",
+        value=(min_date, max_date),
+        min_value=min_date,
+        max_value=max_date
+    )
+
+if len(date_range) == 2:
+    start_filter, end_filter = date_range
+else:
+    start_filter, end_filter = min_date, max_date
+
+date_mask = (
+    df["Start Date Parsed"].isna() |
+    (
+        (df["Start Date Parsed"].dt.date >= start_filter) &
+        (df["Start Date Parsed"].dt.date <= end_filter)
+    )
+)
+
 filtered_df = df[
     (df["Brand Category"].isin(brand_cat_filter)) &
     (df["Brand"].isin(brand_filter)) &
-    (df["Campaign Type"].isin(campaign_type_filter))
+    (df["Campaign Type"].isin(campaign_type_filter)) &
+    date_mask
 ]
 
 
