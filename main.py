@@ -421,7 +421,7 @@ with col3:
                 },
                 "label": {"show": True, "position": "top", "fontSize": 12},
             }],
-        }, height="370px")
+        }, height="460px")
 
 st.divider()
 
