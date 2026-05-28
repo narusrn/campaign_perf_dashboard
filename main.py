@@ -452,8 +452,8 @@ with st.container(border=True):
     fig.update_layout(
         height=520,
         margin=dict(t=30, b=10),
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="white",
+        paper_bgcolor="white",
         font=dict(family="sans-serif", size=14),
         legend=dict(orientation="h", yanchor="bottom", y=1.02),
     )
