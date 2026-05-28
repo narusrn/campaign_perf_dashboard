@@ -43,12 +43,13 @@ h3 {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: #1e293b !important;
-    margin-bottom: 0.75rem !important;
+    margin-bottom: 0.3rem !important;
+    margin-top: 0.2rem !important;
     padding-left: 12px !important;
     border-left: 4px solid #5470c6 !important;
 }
 
-hr { border-color: #e2e8f0 !important; margin: 1rem 0 !important; }
+hr { border-color: #e2e8f0 !important; margin: 0.35rem 0 !important; }
 
 section[data-testid="stSidebar"] {
     background: #ffffff !important;
