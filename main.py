@@ -60,25 +60,23 @@ df["Start Date Parsed"] = pd.to_datetime(
 )
 
 # -------------------------
-# HEADER
-# -------------------------
-col_logo, col_title = st.columns([1, 8])
-with col_logo:
-    logo_path = st.session_state.get("logo_path", "assets/black-logo.png")
-    st.image(logo_path, width=80)
-with col_title:
-    st.title("Campaign Performance Dashboard")
-
-
-# -------------------------
 # SIDEBAR FILTERS
 # -------------------------
 with st.sidebar:
     dark_mode = st.toggle("🌙 Dark Theme", value=False)
-    st.session_state["logo_path"] = "assets/white-logo.png" if dark_mode else "assets/black-logo.png"
+    logo_path = "assets/white-logo.png" if dark_mode else "assets/black-logo.png"
 
     st.divider()
     st.subheader("• Filters")
+
+# -------------------------
+# HEADER
+# -------------------------
+col_logo, col_title = st.columns([1, 8])
+with col_logo:
+    st.image(logo_path, width=80)
+with col_title:
+    st.title("Campaign Performance Dashboard")
     brand_cat_filter = st.multiselect(
         "Brand Category",
         options=df["Brand Category"].dropna().unique(),
