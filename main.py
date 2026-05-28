@@ -308,7 +308,7 @@ with col_l:
                     },
                 },
             ],
-        }, height="480px")
+        }, height="380px")
 
 with col_r:
     with st.container(border=True):
@@ -333,7 +333,7 @@ with col_r:
                 "data": [{"value": int(r["Count"]), "name": r["Brand Category"]} for _, r in brand_cat.iterrows()],
                 "color": COLORS,
             }],
-        }, height="480px")
+        }, height="380px")
 
 st.divider()
 
