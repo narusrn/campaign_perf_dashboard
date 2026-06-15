@@ -41,7 +41,8 @@ BRAND_COLORS = {
     "Knorr":    "#007624",
     "Ponds":    "#F874AF",
     "Axe":      "#201D1D",
-    "LUX":      "#B07C65",
+    "LUX":               "#B07C65",
+    "Unilever Brand Range": "#0606A2",
 }
 
 st.markdown("""
@@ -225,13 +226,6 @@ with st.sidebar:
         max_value=max_date,
     )
 
-    # DEBUG: brands missing CI color
-    missing_colors = sorted(set(df["Brand"].dropna().unique()) - set(BRAND_COLORS.keys()))
-    if missing_colors:
-        st.divider()
-        st.caption("⚠️ Brands missing CI color:")
-        for b in missing_colors:
-            st.caption(f"• {b}")
 
 # -------------------------
 # HEADER
