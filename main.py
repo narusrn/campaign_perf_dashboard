@@ -225,6 +225,14 @@ with st.sidebar:
         max_value=max_date,
     )
 
+    # DEBUG: brands missing CI color
+    missing_colors = sorted(set(df["Brand"].dropna().unique()) - set(BRAND_COLORS.keys()))
+    if missing_colors:
+        st.divider()
+        st.caption("⚠️ Brands missing CI color:")
+        for b in missing_colors:
+            st.caption(f"• {b}")
+
 # -------------------------
 # HEADER
 # -------------------------
