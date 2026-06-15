@@ -26,6 +26,24 @@ def kpi_card(label, value, c1, c2):
 
 COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#fc8452", "#9a60b4", "#ea7ccc"]
 
+BRAND_COLORS = {
+    "Unilever": "#0606A2",
+    "Comfort":  "#043677",
+    "Breeze":   "#00BD00",
+    "Hygiene":  "#0606A2",
+    "Downy":    "#0606A2",
+    "Vaseline": "#00B0E9",
+    "Lipon F":  "#0606A2",
+    "Rexona":   "#00CFD3",
+    "OMO":      "#0606A2",
+    "Fineline": "#0606A2",
+    "Sunlight": "#FFE700",
+    "Knorr":    "#007624",
+    "Ponds":    "#F874AF",
+    "Axe":      "#201D1D",
+    "LUX":      "#B07C65",
+}
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -393,8 +411,7 @@ with col2:
                     "label": {"show": True, "fontSize": 15, "fontWeight": "bold"},
                     "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
                 },
-                "data": [{"value": int(r["Count"]), "name": r["Brand"]} for _, r in brand.iterrows()],
-                "color": COLORS,
+                "data": [{"value": int(r["Count"]), "name": r["Brand"], "itemStyle": {"color": BRAND_COLORS.get(r["Brand"], COLORS[i % len(COLORS)])}} for i, (_, r) in enumerate(brand.iterrows())],
             }],
         }, height="460px")
 
@@ -594,7 +611,7 @@ with st.container(border=True):
                 "type": "custom",
                 "name": brand,
                 "renderItem": render_item,
-                "itemStyle": {"color": COLORS[i % len(COLORS)]},
+                "itemStyle": {"color": BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])},
                 "encode": {"x": [1, 2], "y": 0},
                 "data": data,
             })
