@@ -637,7 +637,7 @@ with st.container(border=True):
         st_echarts(options={
             "tooltip": {"trigger": "item", "formatter": tooltip_fmt},
             "legend": {"data": brands_list, "top": 4, "type": "scroll", "textStyle": {"fontSize": 12}},
-            "grid": {"left": "2%", "right": "2%", "top": "12%", "bottom": "4%", "containLabel": True},
+            "grid": {"left": "170px", "right": "2%", "top": "12%", "bottom": "4%"},
             "xAxis": {
                 "type": "value",
                 "min": axis_min,
