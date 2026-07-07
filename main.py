@@ -379,7 +379,7 @@ with col_l:
                     },
                 },
             ],
-        }, height="365px", events={"click": "function(params) { return params.name; }"})
+        }, height="500px", events={"click": "function(params) { return params.name; }"})
     st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
     if clicked_campaign:
         st.session_state["selected_campaign"] = clicked_campaign
