@@ -52,51 +52,66 @@ BRAND_COLORS = {
     "Unilever Brand Range": "#0606A2",
 }
 
-def _lighten(hex_color, factor):
-    hex_color = hex_color.lstrip("#")
-    r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
-    r, g, b = (int(c + (255 - c) * factor) for c in (r, g, b))
-    return f"#{r:02x}{g:02x}{b:02x}"
+def brand_campaign_type_nested_donut(df, title):
+    center = ["40%", "54%"]
+    total = len(df)
 
+    type_counts = df["Campaign Type"].value_counts()
+    inner = [
+        {"value": int(count), "name": ctype, "itemStyle": {"color": TYPE_COLORS.get(ctype, "#94a3b8")}}
+        for ctype, count in type_counts.items()
+    ]
 
-def brand_campaign_type_nested_donut(df):
-    brand_counts = df["Brand"].value_counts()
-    inner, outer = [], []
-    for i, (brand, count) in enumerate(brand_counts.items()):
-        color = BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])
-        inner.append({"value": int(count), "name": brand, "itemStyle": {"color": color}})
-        type_counts = df.loc[df["Brand"] == brand, "Campaign Type"].value_counts()
-        for j, (ctype, ccount) in enumerate(type_counts.items()):
+    outer = []
+    for ctype, _ in type_counts.items():
+        brand_counts = df.loc[df["Campaign Type"] == ctype, "Brand"].value_counts()
+        for i, (brand, count) in enumerate(brand_counts.items()):
             outer.append({
-                "value": int(ccount),
-                "name": ctype,
-                "itemStyle": {"color": _lighten(color, 0.2 + 0.15 * j)},
+                "value": int(count),
+                "name": brand,
+                "itemStyle": {"color": BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])},
             })
+
     return {
+        "title": [
+            {"text": title, "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+            {
+                "text": f"{total:,}",
+                "subtext": "Campaigns",
+                "left": center[0], "top": center[1],
+                "textAlign": "center",
+                "textVerticalAlign": "middle",
+                "textStyle": {"fontSize": 22, "fontWeight": 800, "color": "#1e293b"},
+                "subtextStyle": {"fontSize": 11, "color": "#94a3b8"},
+            },
+        ],
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
         "legend": {
-            "orient": "vertical", "left": "left", "top": "middle",
-            "textStyle": {"fontSize": 12}, "data": brand_counts.index.tolist(),
+            "type": "scroll",
+            "orient": "vertical", "right": "2%", "top": "middle",
+            "textStyle": {"fontSize": 11}, "data": [d["name"] for d in outer],
         },
         "series": [
             {
-                "name": "Brand",
+                "name": "Campaign Type",
                 "type": "pie",
-                "radius": ["0%", "40%"],
-                "center": ["65%", "50%"],
-                "itemStyle": {"borderColor": "#fff", "borderWidth": 2},
-                "label": {"show": False},
-                "emphasis": {"itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"}},
+                "radius": ["0%", "36%"],
+                "center": center,
+                "minAngle": 4,
+                "itemStyle": {"borderRadius": 4, "borderColor": "#fff", "borderWidth": 2},
+                "label": {"show": True, "position": "inner", "formatter": "{b}", "fontSize": 11, "color": "#fff", "fontWeight": "600"},
+                "emphasis": {"scale": True, "scaleSize": 6, "itemStyle": {"shadowBlur": 14, "shadowColor": "rgba(0,0,0,0.25)"}},
                 "data": inner,
             },
             {
-                "name": "Campaign Type",
+                "name": "Brand",
                 "type": "pie",
-                "radius": ["50%", "72%"],
-                "center": ["65%", "50%"],
-                "itemStyle": {"borderColor": "#fff", "borderWidth": 2},
+                "radius": ["44%", "70%"],
+                "center": center,
+                "minAngle": 3,
+                "itemStyle": {"borderRadius": 6, "borderColor": "#fff", "borderWidth": 2},
                 "label": {"show": False},
-                "emphasis": {"itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"}},
+                "emphasis": {"scale": True, "scaleSize": 6, "itemStyle": {"shadowBlur": 14, "shadowColor": "rgba(0,0,0,0.25)"}},
                 "data": outer,
             },
         ],
@@ -249,6 +264,11 @@ df["Conversion Rate"] = pd.to_numeric(
 df["Start Date Parsed"] = pd.to_datetime(
     df["Start Date"].replace("-", pd.NaT), format="%d-%b-%y", errors="coerce"
 )
+
+TYPE_COLORS = {
+    t: COLORS[i % len(COLORS)]
+    for i, t in enumerate(sorted(df["Campaign Type"].dropna().unique()))
+}
 
 # -------------------------
 # SIDEBAR
@@ -411,10 +431,10 @@ with col_l:
 
 with col_r:
     with st.container(border=True):
-        st_echarts(options={
-            "title": {"text": "Brand · Campaign Type Mix", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
-            **brand_campaign_type_nested_donut(filtered_df),
-        }, height="330px")
+        st_echarts(
+            options=brand_campaign_type_nested_donut(filtered_df, "Brand · Campaign Type Mix"),
+            height="330px",
+        )
 
 st.divider()
 
@@ -448,10 +468,10 @@ with col1:
 
 with col2:
     with st.container(border=True):
-        st_echarts(options={
-            "title": {"text": "By Brand · Campaign Type", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
-            **brand_campaign_type_nested_donut(filtered_df),
-        }, height="460px")
+        st_echarts(
+            options=brand_campaign_type_nested_donut(filtered_df, "By Campaign Type · Brand"),
+            height="460px",
+        )
 
 with col3:
     with st.container(border=True):
