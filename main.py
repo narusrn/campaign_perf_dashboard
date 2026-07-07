@@ -65,8 +65,15 @@ def _gap_slice(value):
     }
 
 
+def _lighten(hex_color, factor):
+    hex_color = hex_color.lstrip("#")
+    r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+    r, g, b = (int(c + (255 - c) * factor) for c in (r, g, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
 def brand_campaign_type_nested_donut(df, title):
-    center = ["40%", "54%"]
+    center = ["50%", "58%"]
     total = len(df)
     gap = max(1, round(total * 0.015))
 
@@ -76,16 +83,15 @@ def brand_campaign_type_nested_donut(df, title):
         if i > 0:
             inner.append(_gap_slice(gap))
             outer.append(_gap_slice(gap))
-        inner.append({"value": int(count), "name": ctype, "itemStyle": {"color": TYPE_COLORS.get(ctype, "#94a3b8")}})
+        type_color = TYPE_COLORS.get(ctype, "#94a3b8")
+        inner.append({"value": int(count), "name": ctype, "itemStyle": {"color": type_color}})
         brand_counts = df.loc[df["Campaign Type"] == ctype, "Brand"].value_counts()
         for j, (brand, bcount) in enumerate(brand_counts.items()):
             outer.append({
                 "value": int(bcount),
                 "name": brand,
-                "itemStyle": {"color": BRAND_COLORS.get(brand, COLORS[j % len(COLORS)])},
+                "itemStyle": {"color": _lighten(type_color, min(0.55, 0.1 * j))},
             })
-
-    legend_names = list(dict.fromkeys(d["name"] for d in outer if d["name"]))
 
     return {
         "title": [
@@ -102,15 +108,14 @@ def brand_campaign_type_nested_donut(df, title):
         ],
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
         "legend": {
-            "type": "scroll",
-            "orient": "vertical", "right": "2%", "top": "middle",
-            "textStyle": {"fontSize": 11}, "data": legend_names,
+            "orient": "horizontal", "left": "center", "top": 26,
+            "textStyle": {"fontSize": 11}, "data": type_counts.index.tolist(),
         },
         "series": [
             {
                 "name": "Campaign Type",
                 "type": "pie",
-                "radius": ["0%", "36%"],
+                "radius": ["0%", "32%"],
                 "center": center,
                 "minAngle": 4,
                 "itemStyle": {"borderRadius": 4, "borderColor": "#fff", "borderWidth": 2},
@@ -121,11 +126,16 @@ def brand_campaign_type_nested_donut(df, title):
             {
                 "name": "Brand",
                 "type": "pie",
-                "radius": ["44%", "70%"],
+                "radius": ["40%", "58%"],
                 "center": center,
                 "minAngle": 3,
+                "avoidLabelOverlap": True,
                 "itemStyle": {"borderRadius": 6, "borderColor": "#fff", "borderWidth": 2},
-                "label": {"show": False},
+                "label": {
+                    "show": True, "formatter": "{b}", "fontSize": 10, "color": "#334155",
+                    "rotate": True, "alignTo": "edge", "edgeDistance": 8,
+                },
+                "labelLine": {"show": True, "length": 6, "length2": 6, "lineStyle": {"color": "#cbd5e1"}},
                 "emphasis": {"scale": True, "scaleSize": 6, "itemStyle": {"shadowBlur": 14, "shadowColor": "rgba(0,0,0,0.25)"}},
                 "data": outer,
             },
