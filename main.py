@@ -379,7 +379,7 @@ with col_l:
                     },
                 },
             ],
-        }, height="330px", events={"click": "function(params) { return params.name; }"})
+        }, height="365px", events={"click": "function(params) { return params.name; }"})
     st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
     if clicked_campaign:
         st.session_state["selected_campaign"] = clicked_campaign
@@ -505,7 +505,7 @@ with col_r:
                 "axisPointer": {"type": "shadow"},
                 "formatter": JsCode("function(p){return p[0].name + '<br/>Conversion Rate: <b>' + p[0].value + '%</b>'}").js_code,
             },
-            "grid": {"left": "3%", "right": "18%", "top": "3%", "bottom": "3%", "containLabel": True},
+            "grid": {"left": "126px", "right": "16%", "top": "3%", "bottom": "3%"},
             "xAxis": {"type": "value", "name": "Conversion Rate (%)", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}, "axisLabel": {"formatter": "{value}%"}},
             "yAxis": {
                 "type": "category",
