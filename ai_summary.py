@@ -44,19 +44,12 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
     zero_conv_worst = zero_conv.sort_values("Visit", ascending=False).head(5)
 
     return (
-        "คุณคือ Senior Marketing Data Analyst ที่เชี่ยวชาญด้านการวิเคราะห์ campaign performance "
-        "ให้วิเคราะห์ข้อมูลแคมเปญด้านล่าง แล้วตอบเป็นภาษาไทย ใช้หัวข้อและ bullet points ดังนี้:\n\n"
-        "1. Overview: สรุปภาพรวมสถานการณ์ปัจจุบันสั้นๆ (2-3 บรรทัด)\n"
-        "2. แคมเปญที่ได้รับความสนใจ/performance ดีที่สุด: ระบุแคมเปญและวิเคราะห์ว่าอะไรที่ทำให้สำเร็จ "
-        "(เช่น Big Prize, Retailer, Campaign Type ที่ตรงกลุ่มเป้าหมาย)\n"
-        "3. แคมเปญที่ performance ไม่ดี: แยกวิเคราะห์ตาม root cause ของแต่ละ metric อย่างชัดเจน เช่น\n"
-        "   - Visit ต่ำ = ปัญหาเรื่อง reach/awareness\n"
-        "   - Visit สูงแต่ Conversion Rate ต่ำ = ปัญหาเรื่อง offer/UX/แรงจูงใจไม่พอ\n"
-        "   - Time on page สั้น = engagement ต่ำ ผู้ใช้ไม่สนใจเนื้อหา\n"
-        "   - Conversion เป็น 0 ทั้งที่ Visit สูง = ปัญหาร้ายแรงที่ conversion funnel\n"
-        "4. Pattern ระดับ Campaign Type: จากข้อมูลสรุปรายประเภทด้านล่าง ชี้ให้เห็นว่าประเภทแคมเปญไหนมี "
-        "ประสิทธิภาพดี/แย่กว่าค่าเฉลี่ยอย่างมีนัยสำคัญ\n"
-        "5. ข้อเสนอแนะเชิง actionable: แยกเป็นข้อๆ ตามแคมเปญหรือกลุ่มปัญหาที่พบ พร้อมระบุว่าควรแก้ที่จุดไหนก่อน\n\n"
+        "คุณคือ Senior Marketing Data Analyst สรุปข้อมูลแคมเปญด้านล่างเป็น Executive Summary ภาษาไทย "
+        "ให้กระชับที่สุด ไม่เกิน 5 bullet points บรรทัดเดียวต่อข้อ ห้ามมีหัวข้อย่อยซ้อนหรือคำนำ/สรุปท้าย:\n"
+        "- แคมเปญ/กลุ่มที่ performance ดีที่สุดและเหตุผลสั้นๆ\n"
+        "- แคมเปญ/กลุ่มที่ performance แย่ที่สุดและ metric ที่เป็นสาเหตุหลัก\n"
+        "- Pattern สำคัญระดับ Campaign Type (ถ้ามี)\n"
+        "- ข้อเสนอแนะที่ควรทำก่อนอันดับแรก\n\n"
         f"จำนวนแคมเปญทั้งหมด: {total_campaigns} | มี conversion: {len(active)} | "
         f"ไม่มี conversion เลย (0): {len(zero_conv)}\n\n"
         f"แคมเปญที่มี conversion สูงสุด (Top 5):\n{_fmt_rows(top)}\n\n"
@@ -76,5 +69,6 @@ def generate_ai_summary(df: pd.DataFrame) -> str:
     resp = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": build_campaign_summary_prompt(df)}],
+        max_tokens=300,
     )
     return resp.choices[0].message.content
