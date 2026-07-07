@@ -52,25 +52,40 @@ BRAND_COLORS = {
     "Unilever Brand Range": "#0606A2",
 }
 
+def _gap_slice(value):
+    # ponytail: a small transparent spacer slice opens a visual gap between category
+    # clusters; it steals ~1-2% off every real slice's displayed {d}% in exchange for
+    # legible clusters. Tooltip still shows the real count, not just the percent.
+    return {
+        "value": value, "name": "",
+        "itemStyle": {"color": "transparent", "borderWidth": 0},
+        "label": {"show": False},
+        "tooltip": {"show": False},
+        "emphasis": {"scale": False, "itemStyle": {"shadowBlur": 0}},
+    }
+
+
 def brand_campaign_type_nested_donut(df, title):
     center = ["40%", "54%"]
     total = len(df)
+    gap = max(1, round(total * 0.015))
 
     type_counts = df["Campaign Type"].value_counts()
-    inner = [
-        {"value": int(count), "name": ctype, "itemStyle": {"color": TYPE_COLORS.get(ctype, "#94a3b8")}}
-        for ctype, count in type_counts.items()
-    ]
-
-    outer = []
-    for ctype, _ in type_counts.items():
+    inner, outer = [], []
+    for i, (ctype, count) in enumerate(type_counts.items()):
+        if i > 0:
+            inner.append(_gap_slice(gap))
+            outer.append(_gap_slice(gap))
+        inner.append({"value": int(count), "name": ctype, "itemStyle": {"color": TYPE_COLORS.get(ctype, "#94a3b8")}})
         brand_counts = df.loc[df["Campaign Type"] == ctype, "Brand"].value_counts()
-        for i, (brand, count) in enumerate(brand_counts.items()):
+        for j, (brand, bcount) in enumerate(brand_counts.items()):
             outer.append({
-                "value": int(count),
+                "value": int(bcount),
                 "name": brand,
-                "itemStyle": {"color": BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])},
+                "itemStyle": {"color": BRAND_COLORS.get(brand, COLORS[j % len(COLORS)])},
             })
+
+    legend_names = list(dict.fromkeys(d["name"] for d in outer if d["name"]))
 
     return {
         "title": [
@@ -89,7 +104,7 @@ def brand_campaign_type_nested_donut(df, title):
         "legend": {
             "type": "scroll",
             "orient": "vertical", "right": "2%", "top": "middle",
-            "textStyle": {"fontSize": 11}, "data": [d["name"] for d in outer],
+            "textStyle": {"fontSize": 11}, "data": legend_names,
         },
         "series": [
             {
