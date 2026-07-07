@@ -271,7 +271,10 @@ st.subheader("• Overview KPI")
 
 total_campaigns   = len(filtered_df)
 total_visits      = int(filtered_df["Visit"].sum())
-total_conversions = int(filtered_df["Conversion"].sum())
+active_campaigns  = filtered_df[filtered_df["Conversion"] > 0]
+avg_conv_per_campaign = (
+    active_campaigns["Conversion"].sum() / len(active_campaigns) if len(active_campaigns) else 0
+)
 avg_conv_rate     = filtered_df["Conversion Rate"].mean()
 
 k1, k2, k3, k4 = st.columns(4)
@@ -280,7 +283,7 @@ with k1:
 with k2:
     st.markdown(kpi_card("Total Visits", f"{total_visits:,}", "#57a661", "#91cc75"), unsafe_allow_html=True)
 with k3:
-    st.markdown(kpi_card("Total Conversions", f"{total_conversions:,}", "#e07b39", "#fac858"), unsafe_allow_html=True)
+    st.markdown(kpi_card("Avg Conversion by Campaign", f"{avg_conv_per_campaign:,.1f}", "#e07b39", "#fac858"), unsafe_allow_html=True)
 with k4:
     conv_val = f"{avg_conv_rate:.2f}%" if pd.notna(avg_conv_rate) else "N/A"
     st.markdown(kpi_card("Avg Conversion Rate", conv_val, "#9a60b4", "#ea7ccc"), unsafe_allow_html=True)
