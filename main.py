@@ -609,7 +609,7 @@ with st.container(border=True):
         # support api.size() in custom series, so a plain bar+stack Gantt is used.
         series = []
         for i, brand in enumerate(brands_list):
-            color = BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])
+            color = _lighten(BRAND_COLORS.get(brand, COLORS[i % len(COLORS)]), 0.45)
             offset_data, duration_data = [], []
             for campaign in y_categories:
                 row = rows_by_campaign[campaign]
