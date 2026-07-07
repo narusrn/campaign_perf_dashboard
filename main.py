@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
-import base64
 from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
 from dotenv import load_dotenv
 
 from ai_summary import generate_ai_summary
+from common import BRAND_COLORS, COLORS, img_to_html, kpi_card, load_campaigns, type_colors
 
 load_dotenv()
 
@@ -14,43 +14,6 @@ now_str = datetime.now().strftime("%d-%b-%y")
 cached_ai_summary = st.cache_data(ttl=86400, show_spinner="กำลังวิเคราะห์แคมเปญ...")(generate_ai_summary)
 
 st.set_page_config(layout="wide", page_title="Campaign Performance")
-
-def img_to_html(path, height=50):
-    with open(path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-    return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px;width:auto;display:block;">'
-
-def kpi_card(label, value, c1, c2):
-    return f'''<div style="
-        background:linear-gradient(135deg,{c1},{c2});
-        border-radius:16px;padding:22px 20px;color:white;
-        box-shadow:0 4px 18px rgba(0,0,0,0.13);
-        display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:0.75rem;font-weight:700;opacity:0.88;
-                    text-transform:uppercase;letter-spacing:0.1em;">{label}</div>
-        <div style="font-size:2.2rem;font-weight:800;line-height:1.0;">{value}</div>
-    </div>'''
-
-COLORS = ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#fc8452", "#9a60b4", "#ea7ccc"]
-
-BRAND_COLORS = {
-    "Unilever": "#0606A2",
-    "Comfort":  "#043677",
-    "Breeze":   "#00BD00",
-    "Hygiene":  "#0606A2",
-    "Downy":    "#0606A2",
-    "Vaseline": "#00B0E9",
-    "Lipon F":  "#0606A2",
-    "Rexona":   "#00CFD3",
-    "OMO":      "#0606A2",
-    "Fineline": "#0606A2",
-    "Sunlight": "#FFE700",
-    "Knorr":    "#007624",
-    "Ponds":    "#F874AF",
-    "Axe":      "#201D1D",
-    "LUX":               "#B07C65",
-    "Unilever Brand Range": "#0606A2",
-}
 
 def _gap_slice(value):
     # ponytail: a small transparent spacer slice opens a visual gap between category
@@ -258,42 +221,8 @@ section[data-testid="stSidebar"] .stDateInput label {
 """, unsafe_allow_html=True)
 
 
-def load_data():
-    sheet_id = "1OisRn14n89ZKwTd2LDyZbwR9iZOMkT9JUzEORVhHkrE"
-    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid=0"
-    df = pd.read_csv(url)
-    df.columns = df.columns.str.strip()
-    return df
-
-df = load_data()
-
-df["Visit"] = (
-    df["Visit"].str.replace(",", "", regex=False).str.replace("-", "0", regex=False).astype(float)
-)
-df["Conversion(Users)"] = (
-    df["Conversion(Users)"].str.replace(",", "", regex=False).str.replace("-", "0", regex=False).astype(float)
-)
-
-df = df.rename(columns={
-    "Conversion(Users)": "Conversion",
-    "Brand category": "Brand Category",
-    "Conversion_rate": "Conversion Rate",
-    "Key event": "Key Event",
-})
-
-df["Conversion Rate"] = pd.to_numeric(
-    df["Conversion Rate"].astype(str).str.replace("%", "", regex=False).str.strip(),
-    errors="coerce",
-)
-
-df["Start Date Parsed"] = pd.to_datetime(
-    df["Start Date"].replace("-", pd.NaT), format="%d-%b-%y", errors="coerce"
-)
-
-TYPE_COLORS = {
-    t: COLORS[i % len(COLORS)]
-    for i, t in enumerate(sorted(df["Campaign Type"].dropna().unique()))
-}
+df = load_campaigns()
+TYPE_COLORS = type_colors(df)
 
 # -------------------------
 # SIDEBAR
@@ -333,11 +262,9 @@ with st.sidebar:
 # -------------------------
 # HEADER
 # -------------------------
-with open(logo_path, "rb") as f:
-    logo_b64 = base64.b64encode(f.read()).decode()
 st.markdown(
     f'<div style="display:flex;align-items:center;gap:14px;padding:48px 0 12px 0;">'
-    f'<img src="data:image/png;base64,{logo_b64}" style="height:52px;width:auto;">'
+    f'{img_to_html(logo_path, height=52)}'
     f'<div>'
     f'<div style="font-size:2rem;font-weight:800;color:#1e293b;line-height:1.1;'
     f'font-family:Inter,sans-serif;letter-spacing:-0.02em;">Campaign Performance Dashboard</div>'
@@ -412,7 +339,7 @@ col_l, col_r = st.columns([3, 2])
 with col_l:
     with st.container(border=True):
         df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
-        st_echarts(options={
+        clicked_campaign = st_echarts(options={
             "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
             "legend": {"data": ["Conversion", "Visit"], "top": 28},
@@ -452,7 +379,11 @@ with col_l:
                     },
                 },
             ],
-        }, height="330px")
+        }, height="330px", events={"click": "function(params) { return params.name; }"})
+        st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
+        if clicked_campaign:
+            st.session_state["selected_campaign"] = clicked_campaign
+            st.switch_page("pages/1_Campaign_Detail.py")
 
 with col_r:
     with st.container(border=True):
