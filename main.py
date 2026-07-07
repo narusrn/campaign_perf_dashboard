@@ -380,10 +380,10 @@ with col_l:
                 },
             ],
         }, height="330px", events={"click": "function(params) { return params.name; }"})
-        st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
-        if clicked_campaign:
-            st.session_state["selected_campaign"] = clicked_campaign
-            st.switch_page("pages/1_Campaign_Detail.py")
+    st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
+    if clicked_campaign:
+        st.session_state["selected_campaign"] = clicked_campaign
+        st.switch_page("pages/1_Campaign_Detail.py")
 
 with col_r:
     with st.container(border=True):
