@@ -298,6 +298,15 @@ with k4:
 st.divider()
 
 # -------------------------
+# AI Summary
+# -------------------------
+st.subheader("• AI Summary")
+with st.container(border=True):
+    st.markdown(cached_ai_summary(filtered_df))
+
+st.divider()
+
+# -------------------------
 # ROW 2: Traffic vs Conversion (3) | Brand Category Donut (2)
 # -------------------------
 st.subheader("• Traffic & Brand Overview")
@@ -658,12 +667,3 @@ st.divider()
 st.subheader("• Overview Table")
 with st.container(border=True):
     st.dataframe(filtered_df, use_container_width=True)
-
-st.divider()
-
-# -------------------------
-# ROW 7: AI Summary
-# -------------------------
-st.subheader("• AI Summary")
-with st.container(border=True):
-    st.markdown(cached_ai_summary(filtered_df))
