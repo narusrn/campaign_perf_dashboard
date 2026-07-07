@@ -52,6 +52,57 @@ BRAND_COLORS = {
     "Unilever Brand Range": "#0606A2",
 }
 
+def _lighten(hex_color, factor):
+    hex_color = hex_color.lstrip("#")
+    r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+    r, g, b = (int(c + (255 - c) * factor) for c in (r, g, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def brand_campaign_type_nested_donut(df):
+    brand_counts = df["Brand"].value_counts()
+    inner, outer = [], []
+    for i, (brand, count) in enumerate(brand_counts.items()):
+        color = BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])
+        inner.append({"value": int(count), "name": brand, "itemStyle": {"color": color}})
+        type_counts = df.loc[df["Brand"] == brand, "Campaign Type"].value_counts()
+        for j, (ctype, ccount) in enumerate(type_counts.items()):
+            outer.append({
+                "value": int(ccount),
+                "name": ctype,
+                "itemStyle": {"color": _lighten(color, 0.2 + 0.15 * j)},
+            })
+    return {
+        "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
+        "legend": {
+            "orient": "vertical", "left": "left", "top": "middle",
+            "textStyle": {"fontSize": 12}, "data": brand_counts.index.tolist(),
+        },
+        "series": [
+            {
+                "name": "Brand",
+                "type": "pie",
+                "radius": ["0%", "40%"],
+                "center": ["65%", "50%"],
+                "itemStyle": {"borderColor": "#fff", "borderWidth": 2},
+                "label": {"show": False},
+                "emphasis": {"itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"}},
+                "data": inner,
+            },
+            {
+                "name": "Campaign Type",
+                "type": "pie",
+                "radius": ["50%", "72%"],
+                "center": ["65%", "50%"],
+                "itemStyle": {"borderColor": "#fff", "borderWidth": 2},
+                "label": {"show": False},
+                "emphasis": {"itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"}},
+                "data": outer,
+            },
+        ],
+    }
+
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -360,27 +411,9 @@ with col_l:
 
 with col_r:
     with st.container(border=True):
-        brand_cat = filtered_df["Brand Category"].value_counts().reset_index()
-        brand_cat.columns = ["Brand Category", "Count"]
         st_echarts(options={
-            "title": {"text": "Brand Category Mix", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
-            "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
-            "legend": {"orient": "vertical", "left": "left", "top": "center"},
-            "series": [{
-                "name": "Brand Category",
-                "type": "pie",
-                "radius": ["45%", "72%"],
-                "center": ["62%", "50%"],
-                "avoidLabelOverlap": True,
-                "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
-                "label": {"show": True, "formatter": "{d}%", "fontSize": 13},
-                "emphasis": {
-                    "label": {"show": True, "fontSize": 16, "fontWeight": "bold"},
-                    "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
-                },
-                "data": [{"value": int(r["Count"]), "name": r["Brand Category"]} for _, r in brand_cat.iterrows()],
-                "color": COLORS,
-            }],
+            "title": {"text": "Brand · Campaign Type Mix", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+            **brand_campaign_type_nested_donut(filtered_df),
         }, height="330px")
 
 st.divider()
@@ -415,25 +448,9 @@ with col1:
 
 with col2:
     with st.container(border=True):
-        brand = filtered_df["Brand"].value_counts().reset_index()
-        brand.columns = ["Brand", "Count"]
         st_echarts(options={
-            "title": {"text": "By Brand", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
-            "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
-            "legend": {"orient": "vertical", "left": "left", "top": "middle", "textStyle": {"fontSize": 12}},
-            "series": [{
-                "name": "Brand",
-                "type": "pie",
-                "radius": ["45%", "72%"],
-                "center": ["65%", "50%"],
-                "itemStyle": {"borderRadius": 8, "borderColor": "#fff", "borderWidth": 2},
-                "label": {"show": False},
-                "emphasis": {
-                    "label": {"show": True, "fontSize": 15, "fontWeight": "bold"},
-                    "itemStyle": {"shadowBlur": 12, "shadowColor": "rgba(0,0,0,0.2)"},
-                },
-                "data": [{"value": int(r["Count"]), "name": r["Brand"], "itemStyle": {"color": BRAND_COLORS.get(r["Brand"], COLORS[i % len(COLORS)])}} for i, (_, r) in enumerate(brand.iterrows())],
-            }],
+            "title": {"text": "By Brand · Campaign Type", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+            **brand_campaign_type_nested_donut(filtered_df),
         }, height="460px")
 
 with col3:
