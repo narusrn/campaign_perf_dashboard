@@ -384,7 +384,7 @@ with col_l:
                     },
                 },
             ],
-        }, height="500px", events={"click": "function(params) { return params.dataIndex; }"})
+        }, height="400px", events={"click": "function(params) { return params.dataIndex; }"})
     st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
     if clicked_index is not None:
         st.session_state["selected_campaign"] = df_sorted.iloc[int(clicked_index)]["Campaign Name"]
@@ -394,7 +394,7 @@ with col_r:
     with st.container(border=True):
         st_echarts(
             options=brand_campaign_type_nested_donut(filtered_df, "Brand · Campaign Type Mix"),
-            height="500px",
+            height="400px",
         )
 
 st.divider()
