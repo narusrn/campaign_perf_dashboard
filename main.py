@@ -132,8 +132,8 @@ def brand_campaign_type_nested_donut(df, title):
                 "avoidLabelOverlap": True,
                 "itemStyle": {"borderRadius": 6, "borderColor": "#fff", "borderWidth": 2},
                 "label": {
-                    "show": True, "formatter": "{b}", "fontSize": 10, "color": "#334155",
-                    "rotate": True, "alignTo": "edge", "edgeDistance": 8,
+                    "show": True, "position": "outside", "formatter": "{b}",
+                    "fontSize": 10, "color": "#334155",
                 },
                 "labelLine": {"show": True, "length": 6, "length2": 6, "lineStyle": {"color": "#cbd5e1"}},
                 "emphasis": {"scale": True, "scaleSize": 6, "itemStyle": {"shadowBlur": 14, "shadowColor": "rgba(0,0,0,0.25)"}},
@@ -468,7 +468,7 @@ st.divider()
 # -------------------------
 st.subheader("• Campaign Breakdown")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns([1, 2, 1])
 
 with col1:
     with st.container(border=True):
@@ -489,13 +489,13 @@ with col1:
                 },
                 "label": {"show": True, "position": "right", "fontSize": 13},
             }],
-        }, height="460px")
+        }, height="360px")
 
 with col2:
     with st.container(border=True):
         st_echarts(
             options=brand_campaign_type_nested_donut(filtered_df, "By Campaign Type · Brand"),
-            height="460px",
+            height="360px",
         )
 
 with col3:
@@ -521,7 +521,7 @@ with col3:
                 },
                 "label": {"show": True, "position": "top", "fontSize": 12},
             }],
-        }, height="460px")
+        }, height="360px")
 
 st.divider()
 
