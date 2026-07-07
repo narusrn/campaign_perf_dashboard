@@ -3,6 +3,11 @@ import pandas as pd
 import base64
 from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
+from dotenv import load_dotenv
+
+from ai_summary import generate_ai_summary
+
+load_dotenv()
 
 now_str = datetime.now().strftime("%d-%b-%y")
 
@@ -651,3 +656,16 @@ st.divider()
 st.subheader("• Overview Table")
 with st.container(border=True):
     st.dataframe(filtered_df, use_container_width=True)
+
+st.divider()
+
+# -------------------------
+# ROW 7: AI Summary
+# -------------------------
+st.subheader("• AI Summary")
+with st.container(border=True):
+    if st.button("Generate AI Summary"):
+        with st.spinner("กำลังวิเคราะห์แคมเปญ..."):
+            st.session_state["ai_summary"] = generate_ai_summary(filtered_df)
+    if "ai_summary" in st.session_state:
+        st.markdown(st.session_state["ai_summary"])
