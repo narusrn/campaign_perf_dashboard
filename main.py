@@ -389,7 +389,7 @@ with col_r:
     with st.container(border=True):
         st_echarts(
             options=brand_campaign_type_nested_donut(filtered_df, "Brand · Campaign Type Mix"),
-            height="330px",
+            height="500px",
         )
 
 st.divider()
