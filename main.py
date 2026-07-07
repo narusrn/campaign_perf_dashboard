@@ -339,15 +339,20 @@ col_l, col_r = st.columns([3, 2])
 with col_l:
     with st.container(border=True):
         df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
-        clicked_campaign = st_echarts(options={
+        # ponytail: truncate in Python, not via echarts axisLabel overflow — containLabel
+        # sizes the grid off the full untruncated string, leaving a big blank margin
+        # once the label actually renders short. Truncating the data itself keeps what's
+        # measured and what's shown in sync.
+        short_names = [n if len(n) <= 16 else n[:15] + "…" for n in df_sorted["Campaign Name"]]
+        clicked_index = st_echarts(options={
             "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
             "legend": {"data": ["Conversion", "Visit"], "top": 28},
             "grid": {"left": "3%", "right": "8%", "bottom": "16%", "top": "14%", "containLabel": True},
             "xAxis": {
                 "type": "category",
-                "data": df_sorted["Campaign Name"].tolist(),
-                "axisLabel": {"rotate": 40, "fontSize": 11, "interval": 0, "overflow": "truncate", "width": 80},
+                "data": short_names,
+                "axisLabel": {"rotate": 40, "fontSize": 11, "interval": 0},
             },
             "yAxis": [
                 {"type": "value", "name": "Conversion"},
@@ -379,10 +384,10 @@ with col_l:
                     },
                 },
             ],
-        }, height="500px", events={"click": "function(params) { return params.name; }"})
+        }, height="500px", events={"click": "function(params) { return params.dataIndex; }"})
     st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
-    if clicked_campaign:
-        st.session_state["selected_campaign"] = clicked_campaign
+    if clicked_index is not None:
+        st.session_state["selected_campaign"] = df_sorted.iloc[int(clicked_index)]["Campaign Name"]
         st.switch_page("pages/1_Campaign_Detail.py")
 
 with col_r:
