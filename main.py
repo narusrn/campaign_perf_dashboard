@@ -360,7 +360,7 @@ with col_l:
                     "barMaxWidth": 35,
                     "data": df_sorted["Conversion"].astype(int).tolist(),
                     "itemStyle": {
-                        "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#91cc75'},{offset:1,color:'#57a661'}])").js_code,
+                        "color": "#57a661",
                         "borderRadius": [4, 4, 0, 0],
                     },
                 },
@@ -375,7 +375,7 @@ with col_l:
                     "lineStyle": {"color": "#5470c6", "width": 2},
                     "itemStyle": {"color": "#5470c6"},
                     "areaStyle": {
-                        "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(84,112,198,0.25)'},{offset:1,color:'rgba(84,112,198,0.0)'}])").js_code
+                        "color": "rgba(84,112,198,0.15)"
                     },
                 },
             ],
@@ -415,7 +415,7 @@ with col1:
                 "type": "bar",
                 "data": ct["Count"].tolist(),
                 "itemStyle": {
-                    "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#73c0de'}])").js_code,
+                    "color": "#5470c6",
                     "borderRadius": [0, 6, 6, 0],
                 },
                 "label": {"show": True, "position": "right", "fontSize": 13},
@@ -447,7 +447,7 @@ with col3:
                 "type": "bar",
                 "data": prize["Conversion"].astype(int).tolist(),
                 "itemStyle": {
-                    "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#fac858'},{offset:1,color:'#fc8452'}])").js_code,
+                    "color": "#fc8452",
                     "borderRadius": [4, 4, 0, 0],
                 },
                 "label": {"show": True, "position": "top", "fontSize": 12},
@@ -484,7 +484,7 @@ with col_l:
                 "type": "bar",
                 "data": feat["Visit"].astype(int).tolist(),
                 "itemStyle": {
-                    "color": JsCode("new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#73c0de'},{offset:1,color:'#5470c6'}])").js_code,
+                    "color": "#73c0de",
                     "borderRadius": [4, 4, 0, 0],
                 },
                 "emphasis": {"itemStyle": {"shadowBlur": 8, "shadowColor": "rgba(0,0,0,0.15)"}},
@@ -516,7 +516,7 @@ with col_r:
                 "type": "bar",
                 "data": ranking["Conversion Rate"].round(2).tolist()[::-1],
                 "itemStyle": {
-                    "color": JsCode("new echarts.graphic.LinearGradient(1,0,0,0,[{offset:0,color:'#5470c6'},{offset:1,color:'#91cc75'}])").js_code,
+                    "color": "#5470c6",
                     "borderRadius": [0, 6, 6, 0],
                 },
                 "label": {"show": True, "position": "right", "fontSize": 12, "formatter": "{c}%"},
@@ -577,68 +577,67 @@ with st.container(border=True):
 
         campaigns_order = tl_df["Campaign Name"].unique().tolist()
         brands_list = tl_df["Brand"].dropna().unique().tolist()
+        y_categories = campaigns_order[::-1]
+        rows_by_campaign = {row["Campaign Name"]: row for _, row in tl_df.iterrows()}
 
-        render_item = JsCode("""
-        function(params, api) {
-            var idx   = api.value(0);
-            var start = api.coord([api.value(1), idx]);
-            var end   = api.coord([api.value(2), idx]);
-            var h     = api.size([0, 1])[1] * 0.8;
-            return {
-                type: 'rect',
-                shape: { x: start[0], y: start[1] - h / 2,
-                         width: Math.max(end[0] - start[0], 2), height: h },
-                style: api.style()
-            };
-        }
-        """).js_code
+        axis_min = int((tl_df["Start Date Ts"].min() - pd.Timedelta(days=3)).timestamp() * 1000)
+        axis_max = int((tl_df["End Date Ts"].max() + pd.Timedelta(days=3)).timestamp() * 1000)
 
-        tooltip_fmt = JsCode("""
-        function(params) {
-            var s = new Date(params.value[1]);
-            var e = new Date(params.value[2]);
-            var months = ['Jan','Feb','Mar','Apr','May','Jun',
-                          'Jul','Aug','Sep','Oct','Nov','Dec'];
-            var fmt = function(d) {
-                return ('0'+d.getDate()).slice(-2) + ' ' +
-                       months[d.getMonth()] + ' ' + d.getFullYear();
-            };
-            return '<b>' + params.value[3] + '</b><br/>' +
-                   'Brand: ' + params.seriesName + '<br/>' +
-                   'Start: ' + fmt(s) + '<br/>' +
-                   'End: '   + fmt(e);
-        }
-        """).js_code
+        # ponytail: JsCode must be single-line here — this frontend's placeholder
+        # regex doesn't match across newlines, so a pretty multi-line function
+        # silently fails to evaluate and renders as literal text instead.
+        axis_label_fmt = JsCode(
+            "function(val) { var d = new Date(val); var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; "
+            "return ('0'+d.getDate()).slice(-2) + ' ' + months[d.getMonth()]; }"
+        ).js_code
 
+        tooltip_fmt = JsCode(
+            "function(params) { if (!params.data || params.data.value == null) { return ''; } "
+            "var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; "
+            "var fmt = function(ts) { var d = new Date(ts); return ('0'+d.getDate()).slice(-2) + ' ' + months[d.getMonth()] + ' ' + d.getFullYear(); }; "
+            "return '<b>' + params.data.campaign + '</b><br/>' + 'Brand: ' + params.seriesName + '<br/>' + "
+            "'Start: ' + fmt(params.data.start) + '<br/>' + 'End: ' + fmt(params.data.end); }"
+        ).js_code
+
+        # ponytail: stacked bar (invisible offset + visible duration) instead of a
+        # "custom" renderItem series — the bundled echarts build here doesn't
+        # support api.size() in custom series, so a plain bar+stack Gantt is used.
         series = []
         for i, brand in enumerate(brands_list):
-            bdf = tl_df[tl_df["Brand"] == brand]
-            data = []
-            for _, row in bdf.iterrows():
-                data.append({"value": [
-                    campaigns_order.index(row["Campaign Name"]),
-                    int(row["Start Date Ts"].timestamp() * 1000),
-                    int(row["End Date Ts"].timestamp() * 1000),
-                    row["Campaign Name"],
-                ]})
+            color = BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])
+            offset_data, duration_data = [], []
+            for campaign in y_categories:
+                row = rows_by_campaign[campaign]
+                if row["Brand"] == brand:
+                    start_ms = int(row["Start Date Ts"].timestamp() * 1000)
+                    end_ms = int(row["End Date Ts"].timestamp() * 1000)
+                    offset_data.append(start_ms)
+                    duration_data.append({
+                        "value": max(end_ms - start_ms, 86400000),
+                        "start": start_ms, "end": end_ms, "campaign": campaign,
+                    })
+                else:
+                    offset_data.append(0)
+                    duration_data.append(0)
             series.append({
-                "type": "custom",
-                "name": brand,
-                "renderItem": render_item,
-                "itemStyle": {"color": BRAND_COLORS.get(brand, COLORS[i % len(COLORS)])},
-                "encode": {"x": [1, 2], "y": 0},
-                "data": data,
+                "name": f"{brand}__offset", "type": "bar", "stack": "gantt",
+                "silent": True, "itemStyle": {"color": "transparent"}, "data": offset_data,
+            })
+            series.append({
+                "name": brand, "type": "bar", "stack": "gantt", "barMaxWidth": 22,
+                "itemStyle": {"color": color, "borderRadius": [3, 3, 3, 3]},
+                "data": duration_data,
             })
 
         st_echarts(options={
-            "tooltip": {"formatter": tooltip_fmt},
+            "tooltip": {"trigger": "item", "formatter": tooltip_fmt},
             "legend": {"data": brands_list, "top": 4, "type": "scroll", "textStyle": {"fontSize": 12}},
             "grid": {"left": "2%", "right": "2%", "top": "12%", "bottom": "4%", "containLabel": True},
             "xAxis": {
-                "type": "time",
-                "axisLabel": {"fontSize": 11},
-                "minInterval": 28 * 24 * 3600 * 1000,
-                "maxInterval": 31 * 24 * 3600 * 1000,
+                "type": "value",
+                "min": axis_min,
+                "max": axis_max,
+                "axisLabel": {"fontSize": 11, "formatter": axis_label_fmt},
                 "splitLine": {
                     "show": True,
                     "lineStyle": {"type": "dashed", "color": "#cbd5e1", "width": 1},
@@ -646,7 +645,7 @@ with st.container(border=True):
             },
             "yAxis": {
                 "type": "category",
-                "data": campaigns_order[::-1],
+                "data": y_categories,
                 "axisLabel": {"fontSize": 11, "width": 160, "overflow": "truncate"},
             },
             "series": series,
