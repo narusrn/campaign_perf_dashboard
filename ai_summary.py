@@ -45,7 +45,9 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
 
     return (
         "คุณคือ Senior Marketing Data Analyst สรุปข้อมูลแคมเปญด้านล่างเป็น Executive Summary ภาษาไทย "
-        "ให้กระชับที่สุด ไม่เกิน 5 bullet points บรรทัดเดียวต่อข้อ ห้ามมีหัวข้อย่อยซ้อนหรือคำนำ/สรุปท้าย:\n"
+        "ให้กระชับที่สุด ตอบเป็น 2 ส่วนเท่านั้น ห้ามมีคำนำหรือสรุปท้ายอื่นนอกจากนี้:\n"
+        "ส่วนที่ 1: ย่อหน้าสั้นๆ 2-3 ประโยค สรุปภาพรวม overall performance ตอนนี้เป็นอย่างไร\n"
+        "ส่วนที่ 2: ไม่เกิน 5 bullet points บรรทัดเดียวต่อข้อ ห้ามมีหัวข้อย่อยซ้อน:\n"
         "- แคมเปญ/กลุ่มที่ performance ดีที่สุดและเหตุผลสั้นๆ\n"
         "- แคมเปญ/กลุ่มที่ performance แย่ที่สุดและ metric ที่เป็นสาเหตุหลัก\n"
         "- Pattern สำคัญระดับ Campaign Type (ถ้ามี)\n"
@@ -69,6 +71,6 @@ def generate_ai_summary(df: pd.DataFrame) -> str:
     resp = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": build_campaign_summary_prompt(df)}],
-        max_tokens=300,
+        max_tokens=400,
     )
     return resp.choices[0].message.content
