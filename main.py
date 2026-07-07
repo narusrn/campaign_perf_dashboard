@@ -11,6 +11,8 @@ load_dotenv()
 
 now_str = datetime.now().strftime("%d-%b-%y")
 
+cached_ai_summary = st.cache_data(ttl=86400, show_spinner="กำลังวิเคราะห์แคมเปญ...")(generate_ai_summary)
+
 st.set_page_config(layout="wide", page_title="Campaign Performance")
 
 def img_to_html(path, height=50):
@@ -664,8 +666,4 @@ st.divider()
 # -------------------------
 st.subheader("• AI Summary")
 with st.container(border=True):
-    if st.button("Generate AI Summary"):
-        with st.spinner("กำลังวิเคราะห์แคมเปญ..."):
-            st.session_state["ai_summary"] = generate_ai_summary(filtered_df)
-    if "ai_summary" in st.session_state:
-        st.markdown(st.session_state["ai_summary"])
+    st.markdown(cached_ai_summary(filtered_df))
