@@ -101,14 +101,7 @@ st.subheader("• Leaderboard")
 l1, l2 = st.columns(2)
 with l1:
     with st.container(border=True):
-        ranking = df.sort_values("Conversion Rate", ascending=False).reset_index(drop=True)
-        rank = ranking.index[ranking["Campaign Name"] == selected].tolist()
-        if rank:
-            st.metric("Rank by Conversion Rate", f"#{rank[0] + 1} of {len(ranking)}")
-        st.dataframe(
-            ranking.head(10)[["Campaign Name", "Conversion Rate"]],
-            use_container_width=True, hide_index=True,
-        )
+        st.caption("Leaderboard — coming soon")
 with l2:
     with st.container(border=True):
         st.caption("Time of the day — no hourly data available yet")
