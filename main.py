@@ -377,7 +377,7 @@ with col_l:
 with col_r:
     with st.container(border=True):
         st_echarts(
-            options=nested_brand_donut(filtered_df, "Brand · Category Mix", "Brand Category", CATEGORY_COLORS),
+            options=nested_brand_donut(filtered_df, "Brand Category → Brand", "Brand Category", CATEGORY_COLORS),
             height="400px",
         )
 
@@ -414,7 +414,7 @@ with col1:
 with col2:
     with st.container(border=True):
         st_echarts(
-            options=nested_brand_donut(filtered_df, "By Campaign Type · Brand", "Campaign Type", TYPE_COLORS),
+            options=nested_brand_donut(filtered_df, "Campaign Type → Brand", "Campaign Type", TYPE_COLORS),
             height="360px",
         )
 
