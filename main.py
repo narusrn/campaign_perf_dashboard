@@ -5,7 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 from ai_summary import generate_ai_summary
-from common import BRAND_COLORS, COLORS, img_to_html, kpi_card, load_campaigns, type_colors
+from common import BRAND_COLORS, COLORS, img_to_html, kpi_card, load_campaigns, stable_colors
 
 load_dotenv()
 
@@ -15,19 +15,6 @@ cached_ai_summary = st.cache_data(ttl=86400, show_spinner="กำลังวิ
 
 st.set_page_config(layout="wide", page_title="Campaign Performance")
 
-def _gap_slice(value):
-    # ponytail: a small transparent spacer slice opens a visual gap between category
-    # clusters; it steals ~1-2% off every real slice's displayed {d}% in exchange for
-    # legible clusters. Tooltip still shows the real count, not just the percent.
-    return {
-        "value": value, "name": "",
-        "itemStyle": {"color": "transparent", "borderWidth": 0},
-        "label": {"show": False},
-        "tooltip": {"show": False},
-        "emphasis": {"scale": False, "itemStyle": {"shadowBlur": 0}},
-    }
-
-
 def _lighten(hex_color, factor):
     hex_color = hex_color.lstrip("#")
     r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
@@ -35,25 +22,21 @@ def _lighten(hex_color, factor):
     return f"#{r:02x}{g:02x}{b:02x}"
 
 
-def brand_campaign_type_nested_donut(df, title):
+def nested_brand_donut(df, title, inner_col, inner_colors):
     center = ["50%", "58%"]
     total = len(df)
-    gap = max(1, round(total * 0.015))
 
-    type_counts = df["Campaign Type"].value_counts()
+    inner_counts = df[inner_col].value_counts()
     inner, outer = [], []
-    for i, (ctype, count) in enumerate(type_counts.items()):
-        if i > 0:
-            inner.append(_gap_slice(gap))
-            outer.append(_gap_slice(gap))
-        type_color = TYPE_COLORS.get(ctype, "#94a3b8")
-        inner.append({"value": int(count), "name": ctype, "itemStyle": {"color": type_color}})
-        brand_counts = df.loc[df["Campaign Type"] == ctype, "Brand"].value_counts()
+    for group, count in inner_counts.items():
+        group_color = inner_colors.get(group, "#94a3b8")
+        inner.append({"value": int(count), "name": group, "itemStyle": {"color": group_color}})
+        brand_counts = df.loc[df[inner_col] == group, "Brand"].value_counts()
         for j, (brand, bcount) in enumerate(brand_counts.items()):
             outer.append({
                 "value": int(bcount),
                 "name": brand,
-                "itemStyle": {"color": _lighten(type_color, min(0.55, 0.1 * j))},
+                "itemStyle": {"color": _lighten(group_color, min(0.55, 0.1 * j))},
             })
 
     return {
@@ -72,11 +55,11 @@ def brand_campaign_type_nested_donut(df, title):
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
         "legend": {
             "orient": "horizontal", "left": "center", "top": 26,
-            "textStyle": {"fontSize": 11}, "data": type_counts.index.tolist(),
+            "textStyle": {"fontSize": 11}, "data": inner_counts.index.tolist(),
         },
         "series": [
             {
-                "name": "Campaign Type",
+                "name": inner_col,
                 "type": "pie",
                 "radius": ["0%", "32%"],
                 "center": center,
@@ -222,7 +205,8 @@ section[data-testid="stSidebar"] .stDateInput label {
 
 
 df = load_campaigns()
-TYPE_COLORS = type_colors(df)
+TYPE_COLORS = stable_colors(df, "Campaign Type")
+CATEGORY_COLORS = stable_colors(df, "Brand Category")
 
 # -------------------------
 # SIDEBAR
@@ -393,7 +377,7 @@ with col_l:
 with col_r:
     with st.container(border=True):
         st_echarts(
-            options=brand_campaign_type_nested_donut(filtered_df, "Brand · Campaign Type Mix"),
+            options=nested_brand_donut(filtered_df, "Brand · Category Mix", "Brand Category", CATEGORY_COLORS),
             height="400px",
         )
 
@@ -430,7 +414,7 @@ with col1:
 with col2:
     with st.container(border=True):
         st_echarts(
-            options=brand_campaign_type_nested_donut(filtered_df, "By Campaign Type · Brand"),
+            options=nested_brand_donut(filtered_df, "By Campaign Type · Brand", "Campaign Type", TYPE_COLORS),
             height="360px",
         )
 

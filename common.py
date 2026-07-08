@@ -45,10 +45,10 @@ def kpi_card(label, value, c1, c2):
     </div>'''
 
 
-def type_colors(df):
+def stable_colors(df, column):
     return {
-        t: COLORS[i % len(COLORS)]
-        for i, t in enumerate(sorted(df["Campaign Type"].dropna().unique()))
+        v: COLORS[i % len(COLORS)]
+        for i, v in enumerate(sorted(df[column].dropna().unique()))
     }
 
 
