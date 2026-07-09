@@ -24,7 +24,6 @@ def _lighten(hex_color, factor):
 
 def nested_brand_donut(df, title, inner_col, inner_colors):
     center = ["50%", "58%"]
-    total = len(df)
 
     inner_counts = df[inner_col].value_counts()
     inner, outer = [], []
@@ -42,15 +41,6 @@ def nested_brand_donut(df, title, inner_col, inner_colors):
     return {
         "title": [
             {"text": title, "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
-            {
-                "text": f"{total:,}",
-                "subtext": "Campaigns",
-                "left": center[0], "top": center[1],
-                "textAlign": "center",
-                "textVerticalAlign": "middle",
-                "textStyle": {"fontSize": 22, "fontWeight": 800, "color": "#1e293b"},
-                "subtextStyle": {"fontSize": 11, "color": "#94a3b8"},
-            },
         ],
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
         "legend": {
