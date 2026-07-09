@@ -389,7 +389,7 @@ with col1:
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
             "grid": {"left": "3%", "right": "15%", "top": "16%", "bottom": "8%", "containLabel": True},
             "xAxis": {"type": "value", "name": "Campaigns", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
-            "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "axisLabel": {"fontSize": 13}},
+            "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "inverse": True, "axisLabel": {"fontSize": 13}},
             "series": [{
                 "type": "bar",
                 "data": ct["Count"].tolist(),
