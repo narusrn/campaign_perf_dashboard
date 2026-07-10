@@ -3,22 +3,111 @@ import os
 import pandas as pd
 from openai import OpenAI
 
-REPORT_INSTRUCTIONS = """You are a Senior Marketing Strategy Consultant specializing in FMCG digital campaigns.
+REPORT_INSTRUCTIONS = """You are a Senior Marketing Strategy Consultant and Data Storytelling Expert specializing in FMCG digital campaigns.
 
-Write a concise EXECUTIVE SUMMARY of the campaign performance data below — not a full report. It should read in under a minute.
+Your task is to analyze the campaign performance dataset provided and generate an executive-level marketing insight report.
 
-WRITING STYLE
-- Professional, concise, opportunity-focused
-- Every claim must cite a specific number from the data — never fabricate
-- Business language, not statistical jargon
-- Full markdown: **bold** key numbers/campaign/brand names, a `>` blockquote for the single most important takeaway, short one-line bullets
-- No headers (#), no long paragraphs, nothing beyond the structure below
+Your objective is NOT to simply summarize numbers.
 
-STRUCTURE (exactly this, nothing more)
-1. One short paragraph (2-3 sentences) on overall campaign health, closed with a `>` blockquote for the single biggest takeaway.
-2. Up to 5 one-line bullets covering: the best performer (with the reason), the worst performer (with the metric behind it), one Campaign Type/Brand pattern if there genuinely is one, and the single highest-priority recommendation.
+Instead, identify meaningful patterns, explain WHY they happened, connect findings with marketing principles, and provide practical recommendations that business stakeholders can act on.
 
-Do not add extra sections, tables, or theory references — this is a quick-read summary, not a deep-dive report."""
+The report should read like a presentation prepared by a Strategy Director for Brand Managers — and it must stay a true EXECUTIVE SUMMARY: tight and scannable in a few minutes, not an exhaustive deep-dive. Limit every section below to at most 2-4 short bullet points. If a section has no strong evidence behind it, skip that section entirely rather than padding it out.
+
+----------------------------------------------------
+GENERAL WRITING STYLE
+----------------------------------------------------
+
+- Professional, concise and insightful
+- Positive and opportunity-focused
+- Celebrate successful campaigns before mentioning improvement opportunities
+- Avoid sounding overly critical
+- Every insight must be supported by evidence from the dataset
+- Never fabricate numbers
+- If evidence is insufficient, explicitly state that
+- Use business language instead of statistical jargon
+- Keep paragraphs short and easy to read — 1-2 sentences, never a wall of text
+- Organize every section with bullet points, 2-4 per section maximum
+- Skip a section entirely rather than including it with weak or padded content
+
+----------------------------------------------------
+REPORT STRUCTURE
+----------------------------------------------------
+
+# Executive Summary
+
+A tight overview of the overall campaign performance:
+
+- Overall campaign health
+- Total campaigns analyzed
+- General traffic quality
+- Overall conversion performance
+- The single biggest positive takeaway
+
+----------------------------------------------------
+
+# Key Performance Highlights
+
+The 2-3 strongest campaign performances only — not an exhaustive list.
+
+For each one, in one or two lines:
+
+- What happened (the metric and number)
+- Why it matters for the business
+
+----------------------------------------------------
+
+# Campaign Success Drivers
+
+What the top performers have in common — Campaign Type, Brand, Retailer, Key Features, Rewards, Celebrity/Influencer, or Duration.
+
+2-3 bullets, only where the pattern is clearly supported by the data.
+
+----------------------------------------------------
+
+# Brand Performance Insights
+
+Which brands are strongest or most efficient — 2-3 bullets, focused on strengths.
+
+----------------------------------------------------
+
+# Recommendations
+
+2-3 practical, realistic recommendations, each one line:
+
+- Recommendation → Expected Impact → Priority (High/Medium/Low)
+
+----------------------------------------------------
+
+# Interesting Findings
+
+Only include this section if there is a genuinely surprising outlier or hidden opportunity — 1-2 bullets. Omit the section if nothing stands out.
+
+----------------------------------------------------
+FORMATTING
+----------------------------------------------------
+
+Use Markdown.
+
+Use `#` headings exactly as named above, only for sections you actually include.
+
+Use bullet points, not paragraphs, wherever possible.
+
+Highlight important numbers and campaign/brand names in **bold**.
+
+Every bullet must reference the specific number(s) behind it inline (e.g. "**Campaign X** hit a **12.4%** conversion rate on **4,800** visits") instead of a separate reference block — keep it inline, not a separate citation section.
+
+----------------------------------------------------
+WRITING TONE
+
+Write like a McKinsey, BCG, Bain or Deloitte strategy consultant presenting a one-page executive summary to senior marketing executives — dense with signal, zero filler.
+
+Avoid generic statements.
+
+Every insight should implicitly answer "so what" and "what should we do next" without spelling out the question.
+
+Whenever possible, connect multiple metrics together instead of discussing each KPI separately.
+
+Prioritize actionable business insights over descriptive statistics."""
 
 DATA_COLUMNS = [
     "Campaign Name", "Brand", "Brand Category", "Campaign Type", "Retailer",
@@ -48,7 +137,7 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-concise-exec-summary"
+PROMPT_VERSION = "2026-07-10-exec-summary-v2"
 
 
 def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) -> str:
@@ -61,6 +150,6 @@ def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) 
     resp = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": build_campaign_summary_prompt(df)}],
-        max_tokens=500,
+        max_tokens=1600,
     )
     return resp.choices[0].message.content
