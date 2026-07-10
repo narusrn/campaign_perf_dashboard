@@ -333,111 +333,82 @@ with st.container(border=True, key="ai-summary"):
 st.divider()
 
 # -------------------------
-# ROW 2: Traffic vs Conversion (3) | Brand Category Donut (2)
+# ROW 2: Traffic vs Conversion — Top 20 Campaigns (full width)
 # -------------------------
 st.subheader("• Traffic & Brand Overview")
 
-col_l, col_r = st.columns([3, 2])
-
-with col_l:
-    with st.container(border=True):
-        df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
-        # ponytail: truncate in Python, not via echarts axisLabel overflow — containLabel
-        # sizes the grid off the full untruncated string, leaving a big blank margin
-        # once the label actually renders short. Truncating the data itself keeps what's
-        # measured and what's shown in sync.
-        short_names = [n if len(n) <= 16 else n[:15] + "…" for n in df_sorted["Campaign Name"]]
-        clicked_index = st_echarts(options={
-            "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
-            "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
-            "legend": {"data": ["Conversion", "Visit"], "top": 28},
-            "grid": {"left": "3%", "right": "8%", "bottom": "16%", "top": "14%", "containLabel": True},
-            "xAxis": {
-                "type": "category",
-                "data": short_names,
-                "axisLabel": {"rotate": 40, "fontSize": 11, "interval": 0},
+with st.container(border=True):
+    df_sorted = filtered_df.sort_values("Visit", ascending=False).head(20)
+    # ponytail: truncate in Python, not via echarts axisLabel overflow — containLabel
+    # sizes the grid off the full untruncated string, leaving a big blank margin
+    # once the label actually renders short. Truncating the data itself keeps what's
+    # measured and what's shown in sync.
+    short_names = [n if len(n) <= 16 else n[:15] + "…" for n in df_sorted["Campaign Name"]]
+    clicked_index = st_echarts(options={
+        "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+        "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
+        "legend": {"data": ["Conversion", "Visit"], "top": 28},
+        "grid": {"left": "3%", "right": "8%", "bottom": "16%", "top": "14%", "containLabel": True},
+        "xAxis": {
+            "type": "category",
+            "data": short_names,
+            "axisLabel": {"rotate": 40, "fontSize": 11, "interval": 0},
+        },
+        "yAxis": [
+            {"type": "value", "name": "Conversion"},
+            {"type": "value", "name": "Visit", "splitLine": {"show": False}},
+        ],
+        "series": [
+            {
+                "name": "Conversion",
+                "type": "bar",
+                "barMaxWidth": 35,
+                "data": df_sorted["Conversion"].astype(int).tolist(),
+                "itemStyle": {
+                    "color": "#57a661",
+                    "borderRadius": [4, 4, 0, 0],
+                },
             },
-            "yAxis": [
-                {"type": "value", "name": "Conversion"},
-                {"type": "value", "name": "Visit", "splitLine": {"show": False}},
-            ],
-            "series": [
-                {
-                    "name": "Conversion",
-                    "type": "bar",
-                    "barMaxWidth": 35,
-                    "data": df_sorted["Conversion"].astype(int).tolist(),
-                    "itemStyle": {
-                        "color": "#57a661",
-                        "borderRadius": [4, 4, 0, 0],
-                    },
+            {
+                "name": "Visit",
+                "type": "line",
+                "yAxisIndex": 1,
+                "smooth": True,
+                "symbol": "circle",
+                "symbolSize": 6,
+                "data": df_sorted["Visit"].astype(int).tolist(),
+                "lineStyle": {"color": "#5470c6", "width": 2},
+                "itemStyle": {"color": "#5470c6"},
+                "areaStyle": {
+                    "color": "rgba(84,112,198,0.15)"
                 },
-                {
-                    "name": "Visit",
-                    "type": "line",
-                    "yAxisIndex": 1,
-                    "smooth": True,
-                    "symbol": "circle",
-                    "symbolSize": 6,
-                    "data": df_sorted["Visit"].astype(int).tolist(),
-                    "lineStyle": {"color": "#5470c6", "width": 2},
-                    "itemStyle": {"color": "#5470c6"},
-                    "areaStyle": {
-                        "color": "rgba(84,112,198,0.15)"
-                    },
-                },
-            ],
-        }, height="400px", events={"click": "function(params) { return params.dataIndex; }"})
-    st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
-    if clicked_index is not None:
-        st.session_state["selected_campaign"] = df_sorted.iloc[int(clicked_index)]["Campaign Name"]
-        st.switch_page("pages/1_Campaign_Detail.py")
-
-with col_r:
-    with st.container(border=True):
-        st_echarts(
-            options=nested_brand_donut(filtered_df, "Brand Category → Brand", "Brand Category", CATEGORY_COLORS),
-            height="400px",
-        )
+            },
+        ],
+    }, height="400px", events={"click": "function(params) { return params.dataIndex; }"})
+st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
+if clicked_index is not None:
+    st.session_state["selected_campaign"] = df_sorted.iloc[int(clicked_index)]["Campaign Name"]
+    st.switch_page("pages/1_Campaign_Detail.py")
 
 st.divider()
 
 # -------------------------
-# ROW 3: Campaign Type | Brand | Big Prize
+# ROW 3: Campaign Breakdown (2 cols x 2 rows)
+#   Row 1: Brand Category -> Brand | Conversions by Prize Theme
+#   Row 2: By Campaign Type       | Campaign Type -> Brand
 # -------------------------
 st.subheader("• Campaign Breakdown")
 
-col1, col2, col3 = st.columns([1, 2, 1])
+r1c1, r1c2 = st.columns(2)
 
-with col1:
-    with st.container(border=True):
-        ct = filtered_df["Campaign Type"].value_counts().reset_index()
-        ct.columns = ["Campaign Type", "Count"]
-        st_echarts(options={
-            "title": {"text": "By Campaign Type", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
-            "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-            "grid": {"left": "3%", "right": "15%", "top": "16%", "bottom": "8%", "containLabel": True},
-            "xAxis": {"type": "value", "name": "Campaigns", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
-            "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "inverse": True, "axisLabel": {"fontSize": 13}},
-            "series": [{
-                "type": "bar",
-                "data": ct["Count"].tolist(),
-                "itemStyle": {
-                    "color": "#5470c6",
-                    "borderRadius": [0, 6, 6, 0],
-                },
-                "label": {"show": True, "position": "right", "fontSize": 13},
-            }],
-        }, height="360px")
-
-with col2:
+with r1c1:
     with st.container(border=True):
         st_echarts(
-            options=nested_brand_donut(filtered_df, "Campaign Type → Brand", "Campaign Type", TYPE_COLORS),
-            height="360px",
+            options=nested_brand_donut(filtered_df, "Brand Category → Brand", "Brand Category", CATEGORY_COLORS),
+            height="380px",
         )
 
-with col3:
+with r1c2:
     with st.container(border=True):
         prize = filtered_df.groupby("Big Prize")["Conversion"].sum().reset_index()
         prize = prize.sort_values("Conversion", ascending=False)
@@ -460,7 +431,37 @@ with col3:
                 },
                 "label": {"show": True, "position": "top", "fontSize": 12},
             }],
-        }, height="360px")
+        }, height="380px")
+
+r2c1, r2c2 = st.columns(2)
+
+with r2c1:
+    with st.container(border=True):
+        ct = filtered_df["Campaign Type"].value_counts().reset_index()
+        ct.columns = ["Campaign Type", "Count"]
+        st_echarts(options={
+            "title": {"text": "By Campaign Type", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+            "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+            "grid": {"left": "3%", "right": "15%", "top": "16%", "bottom": "8%", "containLabel": True},
+            "xAxis": {"type": "value", "name": "Campaigns", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
+            "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "inverse": True, "axisLabel": {"fontSize": 13}},
+            "series": [{
+                "type": "bar",
+                "data": ct["Count"].tolist(),
+                "itemStyle": {
+                    "color": "#5470c6",
+                    "borderRadius": [0, 6, 6, 0],
+                },
+                "label": {"show": True, "position": "right", "fontSize": 13},
+            }],
+        }, height="380px")
+
+with r2c2:
+    with st.container(border=True):
+        st_echarts(
+            options=nested_brand_donut(filtered_df, "Campaign Type → Brand", "Campaign Type", TYPE_COLORS),
+            height="380px",
+        )
 
 st.divider()
 
