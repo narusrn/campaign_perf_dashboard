@@ -314,7 +314,14 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
     )
 
 
-def generate_ai_summary(df: pd.DataFrame) -> str:
+# ponytail: st.cache_data hashes generate_ai_summary's own source, not the
+# other functions/constants it calls — editing the prompt above won't bust an
+# already-cached result on its own. Bump this whenever the prompt changes so
+# the cache key changes too.
+PROMPT_VERSION = "2026-07-10-consulting-report"
+
+
+def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) -> str:
     if df.empty:
         return "ไม่มีข้อมูลแคมเปญให้สรุป"
     api_key = os.getenv("OPENAI_API_KEY")

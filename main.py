@@ -4,7 +4,7 @@ from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
 from dotenv import load_dotenv
 
-from ai_summary import generate_ai_summary
+from ai_summary import PROMPT_VERSION, generate_ai_summary
 from common import BRAND_COLORS, COLORS, img_to_html, kpi_card, load_campaigns, stable_colors
 
 load_dotenv()
@@ -299,7 +299,7 @@ st.divider()
 # -------------------------
 st.subheader("• AI Summary")
 with st.container(border=True):
-    st.markdown(cached_ai_summary(filtered_df))
+    st.markdown(cached_ai_summary(filtered_df, PROMPT_VERSION))
 
 st.divider()
 
