@@ -139,7 +139,7 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-exec-summary-v4-gpt5.2"
+PROMPT_VERSION = "2026-07-10-exec-summary-v5-max-completion-tokens"
 
 MODEL = "gpt-5.2"
 
@@ -155,7 +155,7 @@ def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) 
         resp = client.chat.completions.create(
             model=MODEL,
             messages=[{"role": "user", "content": build_campaign_summary_prompt(df)}],
-            max_tokens=1600,
+            max_completion_tokens=1600,
         )
     except Exception as e:
         return f"⚠️ เรียก AI ไม่สำเร็จ ({MODEL}): {e}"
