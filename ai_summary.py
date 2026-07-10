@@ -30,6 +30,31 @@ GENERAL WRITING STYLE
 - Skip a section entirely rather than including it with weak or padded content
 
 ----------------------------------------------------
+DATA INTERPRETATION RULES
+----------------------------------------------------
+
+Before generating any insights, apply the following rules when interpreting the dataset.
+
+- Treat values of 0, "-", blank, NULL, or missing values in performance metrics (Visits, Unique Visitors, Interaction Time, Conversions, Conversion Rate, etc.) as "Not Available" rather than poor performance.
+- Do NOT assume these campaigns performed poorly.
+- These records may represent:
+    - Information pages
+    - Non-trackable campaign pages
+    - Campaigns without measurable user interactions
+    - Campaigns where tracking was intentionally unavailable
+    - Metrics that are not applicable
+- Exclude these records from:
+    - Rankings
+    - Performance comparisons
+    - Average calculations
+    - Best/Worst performer analysis
+    - Correlation analysis
+    - Success driver analysis
+- Do NOT mention missing, blank, or zero-value campaigns unless the user explicitly asks for data quality assessment.
+- Focus only on campaigns with sufficient measurable performance data when generating business insights.
+- If performance metrics are unavailable, simply ignore those records without mentioning them in the report.
+
+----------------------------------------------------
 REPORT STRUCTURE
 ----------------------------------------------------
 
@@ -152,7 +177,7 @@ def split_summary(text: str) -> tuple[str, str]:
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-exec-summary-v6-split-marker"
+PROMPT_VERSION = "2026-07-10-exec-summary-v7-data-interpretation-rules"
 
 MODEL = "gpt-5.2"
 
