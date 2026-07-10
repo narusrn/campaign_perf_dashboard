@@ -86,13 +86,14 @@ Only include this section if there is a genuinely surprising outlier or hidden o
 FORMATTING
 ----------------------------------------------------
 
-Use Markdown.
+Use Markdown fully to make this easy to scan, not just plain bullets:
 
-Use `#` headings exactly as named above, only for sections you actually include.
-
-Use bullet points, not paragraphs, wherever possible.
-
-Highlight important numbers and campaign/brand names in **bold**.
+- Bullet points, not paragraphs, wherever possible
+- **Bold** important numbers and campaign/brand names
+- Use a `>` blockquote for the single most important takeaway of the whole report
+- Use a small Markdown table when comparing 2 or more campaigns/brands on the same metrics side by side
+- Use *italics* for supporting context or caveats
+- A `---` divider between major sections is fine if it improves scannability
 
 Every bullet must reference the specific number(s) behind it inline (e.g. "**Campaign X** hit a **12.4%** conversion rate on **4,800** visits") instead of a separate reference block — keep it inline, not a separate citation section.
 
@@ -137,7 +138,7 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-exec-summary-v2"
+PROMPT_VERSION = "2026-07-10-exec-summary-v3-markdown"
 
 
 def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) -> str:
