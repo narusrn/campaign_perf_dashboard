@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
 from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
 from dotenv import load_dotenv
@@ -13,7 +14,14 @@ now_str = datetime.now().strftime("%d-%b-%y")
 
 cached_ai_summary = st.cache_data(ttl=86400, show_spinner="กำลังวิเคราะห์แคมเปญ...")(generate_ai_summary)
 
-st.set_page_config(layout="wide", page_title="Campaign Performance")
+_LOGO_PATH = Path("assets/black-logo.png")
+
+st.set_page_config(
+    page_title="Campaign Performance",
+    layout="wide",
+    page_icon=str(_LOGO_PATH) if _LOGO_PATH.exists() else "📊",
+    initial_sidebar_state="expanded",
+)
 
 def _lighten(hex_color, factor):
     hex_color = hex_color.lstrip("#")
