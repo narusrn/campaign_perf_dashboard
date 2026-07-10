@@ -5,7 +5,7 @@ from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
 from dotenv import load_dotenv
 
-from ai_summary import PROMPT_VERSION, generate_ai_summary
+from ai_summary import PROMPT_VERSION, generate_ai_summary, split_summary
 from common import BRAND_COLORS, COLORS, img_to_html, kpi_card, load_campaigns, stable_colors
 
 load_dotenv()
@@ -328,7 +328,11 @@ st.html("""
 </style>
 """)
 with st.container(border=True, key="ai-summary"):
-    st.markdown(cached_ai_summary(filtered_df, PROMPT_VERSION))
+    exec_summary, rest = split_summary(cached_ai_summary(filtered_df, PROMPT_VERSION))
+    st.markdown(exec_summary)
+    if rest:
+        with st.expander("📄 ดู Summary เต็ม"):
+            st.markdown(rest)
 
 st.divider()
 

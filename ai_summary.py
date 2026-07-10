@@ -43,6 +43,8 @@ A tight overview of the overall campaign performance:
 - Overall conversion performance
 - The single biggest positive takeaway
 
+After finishing this Executive Summary section (including its closing blockquote), insert a line containing EXACTLY `<!--MORE-->` and nothing else, before continuing to the next section. This is a hard requirement — include it exactly once, right there, and nowhere else in the report.
+
 ----------------------------------------------------
 
 ### Key Performance Highlights
@@ -135,11 +137,22 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
     )
 
 
+SPLIT_MARKER = "<!--MORE-->"
+
+
+def split_summary(text: str) -> tuple[str, str]:
+    """Split into (always-visible executive summary, collapsible rest)."""
+    if SPLIT_MARKER in text:
+        head, _, tail = text.partition(SPLIT_MARKER)
+        return head.strip(), tail.strip()
+    return text.strip(), ""
+
+
 # ponytail: st.cache_data hashes generate_ai_summary's own source, not the
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-exec-summary-v5-max-completion-tokens"
+PROMPT_VERSION = "2026-07-10-exec-summary-v6-split-marker"
 
 MODEL = "gpt-5.2"
 
