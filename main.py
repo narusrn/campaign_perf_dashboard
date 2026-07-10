@@ -345,10 +345,10 @@ with st.container(border=True):
     # measured and what's shown in sync.
     short_names = [n if len(n) <= 16 else n[:15] + "…" for n in df_sorted["Campaign Name"]]
     clicked_index = st_echarts(options={
-        "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+        "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 6, "textStyle": {"fontSize": 15, "fontWeight": "700", "color": "#1e293b"}},
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
-        "legend": {"data": ["Conversion", "Visit"], "top": 28},
-        "grid": {"left": "3%", "right": "8%", "bottom": "16%", "top": "14%", "containLabel": True},
+        "legend": {"data": ["Conversion", "Visit"], "top": 34},
+        "grid": {"left": "3%", "right": "8%", "bottom": "14%", "top": "16%", "containLabel": True},
         "xAxis": {
             "type": "category",
             "data": short_names,
@@ -363,6 +363,10 @@ with st.container(border=True):
                 "name": "Conversion",
                 "type": "bar",
                 "barMaxWidth": 35,
+                # ponytail: barMinHeight gives near-zero campaigns a visible sliver
+                # instead of vanishing next to the tallest bar — real value still
+                # shown in the tooltip/label, this only affects the pixel floor.
+                "barMinHeight": 4,
                 "data": df_sorted["Conversion"].astype(int).tolist(),
                 "itemStyle": {
                     "color": "#57a661",
@@ -384,7 +388,7 @@ with st.container(border=True):
                 },
             },
         ],
-    }, height="400px", events={"click": "function(params) { return params.dataIndex; }"})
+    }, height="600px", events={"click": "function(params) { return params.dataIndex; }"})
 st.caption("💡 คลิกที่แคมเปญในกราฟเพื่อดูรายละเอียดเพิ่มเติม")
 if clicked_index is not None:
     st.session_state["selected_campaign"] = df_sorted.iloc[int(clicked_index)]["Campaign Name"]
