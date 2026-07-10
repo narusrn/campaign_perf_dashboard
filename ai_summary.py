@@ -148,8 +148,12 @@ DATA_COLUMNS = [
 
 
 def _full_data_table(df: pd.DataFrame) -> str:
-    cols = [c for c in DATA_COLUMNS if c in df.columns]
-    return df[cols].to_csv(index=False)
+    # Campaigns with no (or blank/None) Visit count are typically info pages or
+    # non-trackable placements, not weak campaigns — keep them out of the data
+    # the model sees at all, rather than relying on it to interpret zeros correctly.
+    trackable = df[df["Visit"].notna() & (df["Visit"] != 0)]
+    cols = [c for c in DATA_COLUMNS if c in trackable.columns]
+    return trackable[cols].to_csv(index=False)
 
 
 def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
@@ -177,7 +181,7 @@ def split_summary(text: str) -> tuple[str, str]:
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-exec-summary-v7-data-interpretation-rules"
+PROMPT_VERSION = "2026-07-10-exec-summary-v8-filter-zero-visit"
 
 MODEL = "gpt-5.2"
 
