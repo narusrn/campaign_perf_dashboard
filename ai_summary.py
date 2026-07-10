@@ -63,7 +63,6 @@ REPORT STRUCTURE
 A tight overview of the overall campaign performance:
 
 - Overall campaign health
-- Total campaigns analyzed
 - General traffic quality
 - Overall conversion performance
 - The single biggest positive takeaway
@@ -181,7 +180,7 @@ def split_summary(text: str) -> tuple[str, str]:
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-exec-summary-v8-filter-zero-visit"
+PROMPT_VERSION = "2026-07-10-exec-summary-v9-drop-total-campaigns"
 
 MODEL = "gpt-5.2"
 
