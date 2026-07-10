@@ -48,12 +48,12 @@ def nested_brand_donut(df, title, inner_col, inner_colors):
 
     return {
         "title": [
-            {"text": title, "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+            {"text": title, "left": "center", "top": 4, "textStyle": {"fontSize": 13, "fontWeight": "600", "color": "#64748b"}},
         ],
         "tooltip": {"trigger": "item", "formatter": "{b}: {c} ({d}%)"},
         "legend": {
             "orient": "horizontal", "left": "center", "top": 26,
-            "textStyle": {"fontSize": 11}, "data": inner_counts.index.tolist(),
+            "textStyle": {"fontSize": 12}, "data": inner_counts.index.tolist(),
         },
         "series": [
             {
@@ -63,7 +63,7 @@ def nested_brand_donut(df, title, inner_col, inner_colors):
                 "center": center,
                 "minAngle": 4,
                 "itemStyle": {"borderRadius": 4, "borderColor": "#fff", "borderWidth": 2},
-                "label": {"show": True, "position": "inner", "formatter": "{b}", "fontSize": 11, "color": "#fff", "fontWeight": "600"},
+                "label": {"show": True, "position": "inner", "formatter": "{b}", "fontSize": 12, "color": "#fff", "fontWeight": "600"},
                 "emphasis": {"scale": True, "scaleSize": 6, "itemStyle": {"shadowBlur": 14, "shadowColor": "rgba(0,0,0,0.25)"}},
                 "data": inner,
             },
@@ -77,7 +77,7 @@ def nested_brand_donut(df, title, inner_col, inner_colors):
                 "itemStyle": {"borderRadius": 6, "borderColor": "#fff", "borderWidth": 2},
                 "label": {
                     "show": True, "position": "outside", "formatter": "{b}",
-                    "fontSize": 10, "color": "#334155",
+                    "fontSize": 11, "color": "#334155",
                 },
                 "labelLine": {"show": True, "length": 6, "length2": 6, "lineStyle": {"color": "#cbd5e1"}},
                 "emphasis": {"scale": True, "scaleSize": 6, "itemStyle": {"shadowBlur": 14, "shadowColor": "rgba(0,0,0,0.25)"}},
@@ -345,14 +345,14 @@ with st.container(border=True):
     # measured and what's shown in sync.
     short_names = [n if len(n) <= 16 else n[:15] + "…" for n in df_sorted["Campaign Name"]]
     clicked_index = st_echarts(options={
-        "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 6, "textStyle": {"fontSize": 15, "fontWeight": "700", "color": "#1e293b"}},
+        "title": {"text": "Traffic vs Conversion  ·  Top 20 Campaigns", "left": "center", "top": 6, "textStyle": {"fontSize": 16, "fontWeight": "700", "color": "#1e293b"}},
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "cross"}},
         "legend": {"data": ["Conversion", "Visit"], "top": 34},
         "grid": {"left": "3%", "right": "8%", "bottom": "14%", "top": "16%", "containLabel": True},
         "xAxis": {
             "type": "category",
             "data": short_names,
-            "axisLabel": {"rotate": 40, "fontSize": 11, "interval": 0},
+            "axisLabel": {"rotate": 40, "fontSize": 12, "interval": 0},
         },
         "yAxis": [
             {"type": "value", "name": "Conversion"},
@@ -417,15 +417,15 @@ with r1c2:
         prize = filtered_df.groupby("Big Prize")["Conversion"].sum().reset_index()
         prize = prize.sort_values("Conversion", ascending=False)
         st_echarts(options={
-            "title": {"text": "Conversions by Prize Theme", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+            "title": {"text": "Conversions by Prize Theme", "left": "center", "top": 4, "textStyle": {"fontSize": 13, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
             "grid": {"left": "3%", "right": "5%", "top": "18%", "bottom": "20%", "containLabel": True},
             "xAxis": {
                 "type": "category",
                 "data": prize["Big Prize"].tolist(),
-                "axisLabel": {"rotate": 25, "fontSize": 12},
+                "axisLabel": {"rotate": 25, "fontSize": 13},
             },
-            "yAxis": {"type": "value", "name": "Conversions", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
+            "yAxis": {"type": "value", "name": "Conversions", "nameTextStyle": {"fontSize": 12, "color": "#94a3b8"}},
             "series": [{
                 "type": "bar",
                 "data": prize["Conversion"].astype(int).tolist(),
@@ -433,7 +433,7 @@ with r1c2:
                     "color": "#fc8452",
                     "borderRadius": [4, 4, 0, 0],
                 },
-                "label": {"show": True, "position": "top", "fontSize": 12},
+                "label": {"show": True, "position": "top", "fontSize": 13},
             }],
         }, height="380px")
 
@@ -444,11 +444,11 @@ with r2c1:
         ct = filtered_df["Campaign Type"].value_counts().reset_index()
         ct.columns = ["Campaign Type", "Count"]
         st_echarts(options={
-            "title": {"text": "By Campaign Type", "left": "center", "top": 4, "textStyle": {"fontSize": 12, "fontWeight": "600", "color": "#64748b"}},
+            "title": {"text": "By Campaign Type", "left": "center", "top": 4, "textStyle": {"fontSize": 13, "fontWeight": "600", "color": "#64748b"}},
             "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
             "grid": {"left": "3%", "right": "15%", "top": "16%", "bottom": "8%", "containLabel": True},
-            "xAxis": {"type": "value", "name": "Campaigns", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
-            "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "inverse": True, "axisLabel": {"fontSize": 13}},
+            "xAxis": {"type": "value", "name": "Campaigns", "nameLocation": "end", "nameTextStyle": {"fontSize": 12, "color": "#94a3b8"}},
+            "yAxis": {"type": "category", "data": ct["Campaign Type"].tolist(), "inverse": True, "axisLabel": {"fontSize": 14}},
             "series": [{
                 "type": "bar",
                 "data": ct["Count"].tolist(),
@@ -456,7 +456,7 @@ with r2c1:
                     "color": "#5470c6",
                     "borderRadius": [0, 6, 6, 0],
                 },
-                "label": {"show": True, "position": "right", "fontSize": 13},
+                "label": {"show": True, "position": "right", "fontSize": 14},
             }],
         }, height="380px")
 
@@ -490,9 +490,9 @@ with col_l:
             "xAxis": {
                 "type": "category",
                 "data": feat["Campaign Key Features"].tolist(),
-                "axisLabel": {"rotate": 30, "fontSize": 12},
+                "axisLabel": {"rotate": 30, "fontSize": 13},
             },
-            "yAxis": {"type": "value", "name": "Total Visits", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}},
+            "yAxis": {"type": "value", "name": "Total Visits", "nameTextStyle": {"fontSize": 12, "color": "#94a3b8"}},
             "series": [{
                 "type": "bar",
                 "data": feat["Visit"].astype(int).tolist(),
@@ -501,7 +501,7 @@ with col_l:
                     "borderRadius": [4, 4, 0, 0],
                 },
                 "emphasis": {"itemStyle": {"shadowBlur": 8, "shadowColor": "rgba(0,0,0,0.15)"}},
-                "label": {"show": True, "position": "top", "fontSize": 12},
+                "label": {"show": True, "position": "top", "fontSize": 13},
             }],
         }, height="390px")
 
@@ -519,11 +519,11 @@ with col_r:
                 "formatter": JsCode("function(p){return p[0].name + '<br/>Conversion Rate: <b>' + p[0].value + '%</b>'}").js_code,
             },
             "grid": {"left": "126px", "right": "16%", "top": "3%", "bottom": "3%"},
-            "xAxis": {"type": "value", "name": "Conversion Rate (%)", "nameLocation": "end", "nameTextStyle": {"fontSize": 11, "color": "#94a3b8"}, "axisLabel": {"formatter": "{value}%"}},
+            "xAxis": {"type": "value", "name": "Conversion Rate (%)", "nameLocation": "end", "nameTextStyle": {"fontSize": 12, "color": "#94a3b8"}, "axisLabel": {"formatter": "{value}%"}},
             "yAxis": {
                 "type": "category",
                 "data": ranking["Campaign Name"].tolist()[::-1],
-                "axisLabel": {"fontSize": 12, "width": 120, "overflow": "truncate"},
+                "axisLabel": {"fontSize": 13, "width": 120, "overflow": "truncate"},
             },
             "series": [{
                 "type": "bar",
@@ -532,7 +532,7 @@ with col_r:
                     "color": "#5470c6",
                     "borderRadius": [0, 6, 6, 0],
                 },
-                "label": {"show": True, "position": "right", "fontSize": 12, "formatter": "{c}%"},
+                "label": {"show": True, "position": "right", "fontSize": 13, "formatter": "{c}%"},
             }],
         }, height="390px")
 
@@ -644,13 +644,13 @@ with st.container(border=True):
 
         st_echarts(options={
             "tooltip": {"trigger": "item", "formatter": tooltip_fmt},
-            "legend": {"data": brands_list, "top": 4, "type": "scroll", "textStyle": {"fontSize": 12}},
+            "legend": {"data": brands_list, "top": 4, "type": "scroll", "textStyle": {"fontSize": 13}},
             "grid": {"left": "170px", "right": "2%", "top": "12%", "bottom": "4%"},
             "xAxis": {
                 "type": "value",
                 "min": axis_min,
                 "max": axis_max,
-                "axisLabel": {"fontSize": 11, "formatter": axis_label_fmt},
+                "axisLabel": {"fontSize": 12, "formatter": axis_label_fmt},
                 "splitLine": {
                     "show": True,
                     "lineStyle": {"type": "dashed", "color": "#cbd5e1", "width": 1},
@@ -659,7 +659,7 @@ with st.container(border=True):
             "yAxis": {
                 "type": "category",
                 "data": y_categories,
-                "axisLabel": {"fontSize": 11, "width": 160, "overflow": "truncate"},
+                "axisLabel": {"fontSize": 12, "width": 160, "overflow": "truncate"},
             },
             "series": series,
         }, height="520px")
