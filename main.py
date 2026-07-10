@@ -325,13 +325,21 @@ st.html("""
     margin-top: 0.2em !important;
     margin-bottom: 0.6em !important;
 }
+.st-key-ai-summary [data-testid="stExpander"] summary {
+    display: flex !important;
+    justify-content: center !important;
+}
+.st-key-ai-summary [data-testid="stExpander"] summary > span {
+    flex: 0 0 auto !important;
+    width: fit-content !important;
+}
 </style>
 """)
 with st.container(border=True, key="ai-summary"):
     exec_summary, rest = split_summary(cached_ai_summary(filtered_df, PROMPT_VERSION))
     st.markdown(exec_summary)
     if rest:
-        with st.expander("📄 ดู Summary เต็ม"):
+        with st.expander("📄 View Full Summary"):
             st.markdown(rest)
 
 st.divider()
