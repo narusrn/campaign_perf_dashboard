@@ -33,7 +33,7 @@ GENERAL WRITING STYLE
 REPORT STRUCTURE
 ----------------------------------------------------
 
-# Executive Summary
+### Executive Summary
 
 A tight overview of the overall campaign performance:
 
@@ -45,7 +45,7 @@ A tight overview of the overall campaign performance:
 
 ----------------------------------------------------
 
-# Key Performance Highlights
+### Key Performance Highlights
 
 The 2-3 strongest campaign performances only — not an exhaustive list.
 
@@ -56,7 +56,7 @@ For each one, in one or two lines:
 
 ----------------------------------------------------
 
-# Campaign Success Drivers
+### Campaign Success Drivers
 
 What the top performers have in common — Campaign Type, Brand, Retailer, Key Features, Rewards, Celebrity/Influencer, or Duration.
 
@@ -64,13 +64,13 @@ What the top performers have in common — Campaign Type, Brand, Retailer, Key F
 
 ----------------------------------------------------
 
-# Brand Performance Insights
+### Brand Performance Insights
 
 Which brands are strongest or most efficient — 2-3 bullets, focused on strengths.
 
 ----------------------------------------------------
 
-# Recommendations
+### Recommendations
 
 2-3 practical, realistic recommendations, each one line:
 
@@ -78,7 +78,7 @@ Which brands are strongest or most efficient — 2-3 bullets, focused on strengt
 
 ----------------------------------------------------
 
-# Interesting Findings
+### Interesting Findings
 
 Only include this section if there is a genuinely surprising outlier or hidden opportunity — 1-2 bullets. Omit the section if nothing stands out.
 
@@ -88,6 +88,7 @@ FORMATTING
 
 Use Markdown fully to make this easy to scan, not just plain bullets:
 
+- Use `###` for every section heading above — never `#` or `##`, they render too large
 - Bullet points, not paragraphs, wherever possible
 - **Bold** important numbers and campaign/brand names
 - Use a `>` blockquote for the single most important takeaway of the whole report
@@ -138,7 +139,9 @@ def build_campaign_summary_prompt(df: pd.DataFrame) -> str:
 # other functions/constants it calls — editing the prompt above won't bust an
 # already-cached result on its own. Bump this whenever the prompt changes so
 # the cache key changes too.
-PROMPT_VERSION = "2026-07-10-exec-summary-v3-markdown"
+PROMPT_VERSION = "2026-07-10-exec-summary-v4-gpt5.2"
+
+MODEL = "gpt-5.2"
 
 
 def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) -> str:
@@ -148,9 +151,12 @@ def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) 
     if not api_key:
         return "⚠️ ไม่พบ OPENAI_API_KEY กรุณาตั้งค่าใน .env"
     client = OpenAI(api_key=api_key)
-    resp = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": build_campaign_summary_prompt(df)}],
-        max_tokens=1600,
-    )
+    try:
+        resp = client.chat.completions.create(
+            model=MODEL,
+            messages=[{"role": "user", "content": build_campaign_summary_prompt(df)}],
+            max_tokens=1600,
+        )
+    except Exception as e:
+        return f"⚠️ เรียก AI ไม่สำเร็จ ({MODEL}): {e}"
     return resp.choices[0].message.content

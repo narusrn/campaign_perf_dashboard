@@ -298,7 +298,28 @@ st.divider()
 # AI Summary
 # -------------------------
 st.subheader("• AI Summary")
-with st.container(border=True):
+st.html("""
+<style>
+.st-key-ai-summary h1, .st-key-ai-summary h2, .st-key-ai-summary h3, .st-key-ai-summary h4 {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    margin: 0.9em 0 0.35em 0 !important;
+}
+.st-key-ai-summary h1:first-child, .st-key-ai-summary h2:first-child, .st-key-ai-summary h3:first-child {
+    margin-top: 0 !important;
+}
+.st-key-ai-summary p, .st-key-ai-summary li {
+    line-height: 1.55 !important;
+    margin-bottom: 0.35em !important;
+}
+.st-key-ai-summary ul, .st-key-ai-summary ol {
+    margin-top: 0.2em !important;
+    margin-bottom: 0.6em !important;
+}
+</style>
+""")
+with st.container(border=True, key="ai-summary"):
     st.markdown(cached_ai_summary(filtered_df, PROMPT_VERSION))
 
 st.divider()
