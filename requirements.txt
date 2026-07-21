@@ -1,5 +1,5 @@
-streamlit
-pandas
+streamlit==1.57.0
+pandas==3.0.3
 streamlit-echarts==0.4.0
-openai
-python-dotenv
+openai==2.41.0
+python-dotenv==1.2.2

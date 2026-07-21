@@ -1,0 +1,14 @@
+.git
+.github
+.devcontainer
+.vscode
+.claude
+.streamlit/secrets.toml
+__pycache__/
+*.pyc
+.env
+streamlit.log
+test.ipynb
+data/
+README.md
+CLAUDE.md
