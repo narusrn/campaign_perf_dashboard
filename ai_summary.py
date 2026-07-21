@@ -1,7 +1,20 @@
+import contextlib
 import os
 
 import pandas as pd
+import streamlit as st
 from openai import OpenAI
+
+
+def _get_api_key():
+    # .streamlit/secrets.toml is the intended config method; os.getenv covers
+    # secrets injected as a real process env var (systemd, container, etc.).
+    # st.secrets.get() raises if secrets.toml doesn't exist at all, so that
+    # lookup needs suppressing rather than crashing when it's simply unused.
+    with contextlib.suppress(Exception):
+        if key := st.secrets.get("OPENAI_API_KEY"):
+            return key
+    return os.getenv("OPENAI_API_KEY")
 
 REPORT_INSTRUCTIONS = """You are a Senior Marketing Strategy Consultant and Data Storytelling Expert specializing in FMCG digital campaigns.
 
@@ -188,9 +201,9 @@ MODEL = "gpt-5.2"
 def generate_ai_summary(df: pd.DataFrame, prompt_version: str = PROMPT_VERSION) -> str:
     if df.empty:
         return "ไม่มีข้อมูลแคมเปญให้สรุป"
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = _get_api_key()
     if not api_key:
-        return "⚠️ ไม่พบ OPENAI_API_KEY กรุณาตั้งค่าใน .env"
+        return "⚠️ ไม่พบ OPENAI_API_KEY กรุณาตั้งค่าใน .streamlit/secrets.toml"
     client = OpenAI(api_key=api_key)
     try:
         resp = client.chat.completions.create(

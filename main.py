@@ -3,12 +3,9 @@ import pandas as pd
 from pathlib import Path
 from streamlit_echarts import st_echarts, JsCode
 from datetime import datetime
-from dotenv import load_dotenv
 
 from ai_summary import PROMPT_VERSION, generate_ai_summary, split_summary
 from common import BRAND_COLORS, COLORS, img_to_html, kpi_card, load_campaigns, stable_colors
-
-load_dotenv()
 
 now_str = datetime.now().strftime("%d-%b-%y")
 

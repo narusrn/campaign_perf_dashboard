@@ -1,3 +1,4 @@
 .env
+.streamlit/secrets.toml
 test_ai_summary.py
 __pycache__/
